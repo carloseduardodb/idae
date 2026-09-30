@@ -1,0 +1,15 @@
+
+=== E2 — financeiro (claude-opus-4.5) ===
+abordagem                             n  correto  corrupção  rej.corr  rej.falsa  chamadas  tokens~
+Schema-Based                        550    19.1%       0.0%        35        410         0        0
+IDAE                                550    90.9%       0.0%        35         15        17    14780
+LLM-Direct                          150    72.7%       4.0%        35          0       150    58071
+LLM+Val+Retry                       150    74.0%       2.7%        35          0       150    58063
+
+=== E2 — iot (claude-opus-4.5) ===
+abordagem                             n  correto  corrupção  rej.corr  rej.falsa  chamadas  tokens~
+Schema-Based                        550    19.1%       0.0%        35        410         0        0
+IDAE                                550    90.9%       0.0%        35         15        20    23647
+LLM-Direct                          150    76.0%       0.7%        35          0       150    74500
+LLM+Val+Retry                       150    76.0%       0.7%        35          0       150    74501
+arquivo: results/e2-baselines-claude-opus-4.5.json

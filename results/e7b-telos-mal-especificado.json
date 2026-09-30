@@ -1,0 +1,2059 @@
+{
+  "model": "claude-opus-4.5",
+  "generatedAt": "2026-09-29T22:26:08.000Z",
+  "tz": "America/Sao_Paulo",
+  "partB": [
+    {
+      "approach": "IDAE telos permissivo",
+      "domain": "financeiro-permissivo",
+      "n": 30,
+      "total": {
+        "n": 30,
+        "accepted": 30,
+        "correct": 10,
+        "corrupt": 20,
+        "correctReject": 0,
+        "falseReject": 0,
+        "fieldErrors": {
+          "<should-reject>": 20
+        },
+        "shouldReject": 20
+      },
+      "totalRates": {
+        "n": 30,
+        "accuracy": 0.3333333333333333,
+        "correctRate": 0.3333333333333333,
+        "corruptRate": 0.6666666666666666,
+        "corruptAmongAccepted": 0.6666666666666666,
+        "falseRejectRate": 0,
+        "acceptRate": 1
+      },
+      "perPhase": {
+        "B": {
+          "n": 30,
+          "accepted": 30,
+          "correct": 10,
+          "corrupt": 20,
+          "correctReject": 0,
+          "falseReject": 0,
+          "fieldErrors": {
+            "<should-reject>": 20
+          },
+          "shouldReject": 20,
+          "rates": {
+            "n": 30,
+            "accuracy": 0.3333333333333333,
+            "correctRate": 0.3333333333333333,
+            "corruptRate": 0.6666666666666666,
+            "corruptAmongAccepted": 0.6666666666666666,
+            "falseRejectRate": 0,
+            "acceptRate": 1
+          }
+        }
+      },
+      "perKind": {
+        "valido": {
+          "n": 10,
+          "accepted": 10,
+          "correct": 10,
+          "corrupt": 0,
+          "correctReject": 0,
+          "falseReject": 0,
+          "fieldErrors": {},
+          "shouldReject": 0,
+          "rates": {
+            "n": 10,
+            "accuracy": 1,
+            "correctRate": 1,
+            "corruptRate": 0,
+            "corruptAmongAccepted": 0,
+            "falseRejectRate": 0,
+            "acceptRate": 1
+          }
+        },
+        "negativo": {
+          "n": 10,
+          "accepted": 10,
+          "correct": 0,
+          "corrupt": 10,
+          "correctReject": 0,
+          "falseReject": 0,
+          "fieldErrors": {
+            "<should-reject>": 10
+          },
+          "shouldReject": 10,
+          "rates": {
+            "n": 10,
+            "accuracy": 0,
+            "correctRate": 0,
+            "corruptRate": 1,
+            "corruptAmongAccepted": 1,
+            "falseRejectRate": 0,
+            "acceptRate": 1
+          }
+        },
+        "zero": {
+          "n": 10,
+          "accepted": 10,
+          "correct": 0,
+          "corrupt": 10,
+          "correctReject": 0,
+          "falseReject": 0,
+          "fieldErrors": {
+            "<should-reject>": 10
+          },
+          "shouldReject": 10,
+          "rates": {
+            "n": 10,
+            "accuracy": 0,
+            "correctRate": 0,
+            "corruptRate": 1,
+            "corruptAmongAccepted": 1,
+            "falseRejectRate": 0,
+            "acceptRate": 1
+          }
+        }
+      },
+      "stats": {
+        "llmCalls": 1,
+        "promptChars": 1541,
+        "responseChars": 1145,
+        "llmMs": 6511,
+        "syntheses": 1,
+        "programsActivated": 1,
+        "disagreements": 0,
+        "llmErrors": 0,
+        "estTokens": 672
+      },
+      "hrTrace": [
+        {
+          "attempts": 1,
+          "converged": true
+        }
+      ],
+      "wallMs": 6515,
+      "records": [
+        {
+          "phase": "B",
+          "idx": 0,
+          "kind": "valido",
+          "cls": "correct",
+          "wrong": [],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0000",
+            "value_in_usd": 3041.33,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 1,
+          "kind": "negativo",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0001",
+            "value_in_usd": -4898.15,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 2,
+          "kind": "zero",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0002",
+            "value_in_usd": 0,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 3,
+          "kind": "valido",
+          "cls": "correct",
+          "wrong": [],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0003",
+            "value_in_usd": 958.9,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 4,
+          "kind": "negativo",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0004",
+            "value_in_usd": -1386.32,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 5,
+          "kind": "zero",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0005",
+            "value_in_usd": 0,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 6,
+          "kind": "valido",
+          "cls": "correct",
+          "wrong": [],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0006",
+            "value_in_usd": 4081.97,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 7,
+          "kind": "negativo",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0007",
+            "value_in_usd": -3421.08,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 8,
+          "kind": "zero",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0008",
+            "value_in_usd": 0,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 9,
+          "kind": "valido",
+          "cls": "correct",
+          "wrong": [],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0009",
+            "value_in_usd": 851.85,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 10,
+          "kind": "negativo",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0010",
+            "value_in_usd": -1700.13,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 11,
+          "kind": "zero",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0011",
+            "value_in_usd": 0,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 12,
+          "kind": "valido",
+          "cls": "correct",
+          "wrong": [],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0012",
+            "value_in_usd": 3860.45,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 13,
+          "kind": "negativo",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0013",
+            "value_in_usd": -3806.03,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 14,
+          "kind": "zero",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0014",
+            "value_in_usd": 0,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 15,
+          "kind": "valido",
+          "cls": "correct",
+          "wrong": [],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0015",
+            "value_in_usd": 2840.24,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 16,
+          "kind": "negativo",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0016",
+            "value_in_usd": -1381.45,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 17,
+          "kind": "zero",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0017",
+            "value_in_usd": 0,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 18,
+          "kind": "valido",
+          "cls": "correct",
+          "wrong": [],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0018",
+            "value_in_usd": 1594.86,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 19,
+          "kind": "negativo",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0019",
+            "value_in_usd": -2558.69,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 20,
+          "kind": "zero",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0020",
+            "value_in_usd": 0,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 21,
+          "kind": "valido",
+          "cls": "correct",
+          "wrong": [],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0021",
+            "value_in_usd": 844.96,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 22,
+          "kind": "negativo",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0022",
+            "value_in_usd": -1225.91,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 23,
+          "kind": "zero",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0023",
+            "value_in_usd": 0,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 24,
+          "kind": "valido",
+          "cls": "correct",
+          "wrong": [],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0024",
+            "value_in_usd": 4938.56,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 25,
+          "kind": "negativo",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0025",
+            "value_in_usd": -3048.27,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 26,
+          "kind": "zero",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0026",
+            "value_in_usd": 0,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 27,
+          "kind": "valido",
+          "cls": "correct",
+          "wrong": [],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0027",
+            "value_in_usd": 3711.89,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 28,
+          "kind": "negativo",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0028",
+            "value_in_usd": -4624.93,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 29,
+          "kind": "zero",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0029",
+            "value_in_usd": 0,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        }
+      ]
+    },
+    {
+      "approach": "IDAE telos correto",
+      "domain": "financeiro",
+      "n": 30,
+      "total": {
+        "n": 30,
+        "accepted": 1,
+        "correct": 1,
+        "corrupt": 0,
+        "correctReject": 20,
+        "falseReject": 9,
+        "fieldErrors": {},
+        "shouldReject": 20
+      },
+      "totalRates": {
+        "n": 30,
+        "accuracy": 0.7,
+        "correctRate": 0.03333333333333333,
+        "corruptRate": 0,
+        "corruptAmongAccepted": 0,
+        "falseRejectRate": 0.3,
+        "acceptRate": 0.03333333333333333
+      },
+      "perPhase": {
+        "B": {
+          "n": 30,
+          "accepted": 1,
+          "correct": 1,
+          "corrupt": 0,
+          "correctReject": 20,
+          "falseReject": 9,
+          "fieldErrors": {},
+          "shouldReject": 20,
+          "rates": {
+            "n": 30,
+            "accuracy": 0.7,
+            "correctRate": 0.03333333333333333,
+            "corruptRate": 0,
+            "corruptAmongAccepted": 0,
+            "falseRejectRate": 0.3,
+            "acceptRate": 0.03333333333333333
+          }
+        }
+      },
+      "perKind": {
+        "valido": {
+          "n": 10,
+          "accepted": 1,
+          "correct": 1,
+          "corrupt": 0,
+          "correctReject": 0,
+          "falseReject": 9,
+          "fieldErrors": {},
+          "shouldReject": 0,
+          "rates": {
+            "n": 10,
+            "accuracy": 0.1,
+            "correctRate": 0.1,
+            "corruptRate": 0,
+            "corruptAmongAccepted": 0,
+            "falseRejectRate": 0.9,
+            "acceptRate": 0.1
+          }
+        },
+        "negativo": {
+          "n": 10,
+          "accepted": 0,
+          "correct": 0,
+          "corrupt": 0,
+          "correctReject": 10,
+          "falseReject": 0,
+          "fieldErrors": {},
+          "shouldReject": 10,
+          "rates": {
+            "n": 10,
+            "accuracy": 1,
+            "correctRate": 0,
+            "corruptRate": 0,
+            "corruptAmongAccepted": 0,
+            "falseRejectRate": 0,
+            "acceptRate": 0
+          }
+        },
+        "zero": {
+          "n": 10,
+          "accepted": 0,
+          "correct": 0,
+          "corrupt": 0,
+          "correctReject": 10,
+          "falseReject": 0,
+          "fieldErrors": {},
+          "shouldReject": 10,
+          "rates": {
+            "n": 10,
+            "accuracy": 1,
+            "correctRate": 0,
+            "corruptRate": 0,
+            "corruptAmongAccepted": 0,
+            "falseRejectRate": 0,
+            "acceptRate": 0
+          }
+        }
+      },
+      "stats": {
+        "llmCalls": 4,
+        "promptChars": 7287,
+        "responseChars": 6987,
+        "llmMs": 33119,
+        "syntheses": 4,
+        "programsActivated": 1,
+        "disagreements": 0,
+        "llmErrors": 0,
+        "estTokens": 3569
+      },
+      "hrTrace": [
+        {
+          "attempts": 1,
+          "converged": true
+        },
+        {
+          "attempts": 3,
+          "converged": false
+        }
+      ],
+      "wallMs": 33123,
+      "records": [
+        {
+          "phase": "B",
+          "idx": 0,
+          "kind": "valido",
+          "cls": "correct",
+          "wrong": [],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0000",
+            "value_in_usd": 3041.33,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 1,
+          "kind": "negativo",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "ttl-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 2,
+          "kind": "zero",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 3,
+          "kind": "valido",
+          "cls": "falseReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 4,
+          "kind": "negativo",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 5,
+          "kind": "zero",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 6,
+          "kind": "valido",
+          "cls": "falseReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 7,
+          "kind": "negativo",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 8,
+          "kind": "zero",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 9,
+          "kind": "valido",
+          "cls": "falseReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 10,
+          "kind": "negativo",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 11,
+          "kind": "zero",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 12,
+          "kind": "valido",
+          "cls": "falseReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 13,
+          "kind": "negativo",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 14,
+          "kind": "zero",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 15,
+          "kind": "valido",
+          "cls": "falseReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 16,
+          "kind": "negativo",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 17,
+          "kind": "zero",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 18,
+          "kind": "valido",
+          "cls": "falseReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 19,
+          "kind": "negativo",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 20,
+          "kind": "zero",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 21,
+          "kind": "valido",
+          "cls": "falseReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 22,
+          "kind": "negativo",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 23,
+          "kind": "zero",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 24,
+          "kind": "valido",
+          "cls": "falseReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 25,
+          "kind": "negativo",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 26,
+          "kind": "zero",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 27,
+          "kind": "valido",
+          "cls": "falseReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 28,
+          "kind": "negativo",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 29,
+          "kind": "zero",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        }
+      ]
+    },
+    {
+      "approach": "IDAE telos permissivo (Haiku 4.5)",
+      "domain": "financeiro-permissivo",
+      "n": 30,
+      "total": {
+        "n": 30,
+        "accepted": 30,
+        "correct": 10,
+        "corrupt": 20,
+        "correctReject": 0,
+        "falseReject": 0,
+        "fieldErrors": {
+          "<should-reject>": 20
+        },
+        "shouldReject": 20
+      },
+      "totalRates": {
+        "n": 30,
+        "accuracy": 0.3333333333333333,
+        "correctRate": 0.3333333333333333,
+        "corruptRate": 0.6666666666666666,
+        "corruptAmongAccepted": 0.6666666666666666,
+        "falseRejectRate": 0,
+        "acceptRate": 1
+      },
+      "perPhase": {
+        "B": {
+          "n": 30,
+          "accepted": 30,
+          "correct": 10,
+          "corrupt": 20,
+          "correctReject": 0,
+          "falseReject": 0,
+          "fieldErrors": {
+            "<should-reject>": 20
+          },
+          "shouldReject": 20,
+          "rates": {
+            "n": 30,
+            "accuracy": 0.3333333333333333,
+            "correctRate": 0.3333333333333333,
+            "corruptRate": 0.6666666666666666,
+            "corruptAmongAccepted": 0.6666666666666666,
+            "falseRejectRate": 0,
+            "acceptRate": 1
+          }
+        }
+      },
+      "perKind": {
+        "valido": {
+          "n": 10,
+          "accepted": 10,
+          "correct": 10,
+          "corrupt": 0,
+          "correctReject": 0,
+          "falseReject": 0,
+          "fieldErrors": {},
+          "shouldReject": 0,
+          "rates": {
+            "n": 10,
+            "accuracy": 1,
+            "correctRate": 1,
+            "corruptRate": 0,
+            "corruptAmongAccepted": 0,
+            "falseRejectRate": 0,
+            "acceptRate": 1
+          }
+        },
+        "negativo": {
+          "n": 10,
+          "accepted": 10,
+          "correct": 0,
+          "corrupt": 10,
+          "correctReject": 0,
+          "falseReject": 0,
+          "fieldErrors": {
+            "<should-reject>": 10
+          },
+          "shouldReject": 10,
+          "rates": {
+            "n": 10,
+            "accuracy": 0,
+            "correctRate": 0,
+            "corruptRate": 1,
+            "corruptAmongAccepted": 1,
+            "falseRejectRate": 0,
+            "acceptRate": 1
+          }
+        },
+        "zero": {
+          "n": 10,
+          "accepted": 10,
+          "correct": 0,
+          "corrupt": 10,
+          "correctReject": 0,
+          "falseReject": 0,
+          "fieldErrors": {
+            "<should-reject>": 10
+          },
+          "shouldReject": 10,
+          "rates": {
+            "n": 10,
+            "accuracy": 0,
+            "correctRate": 0,
+            "corruptRate": 1,
+            "corruptAmongAccepted": 1,
+            "falseRejectRate": 0,
+            "acceptRate": 1
+          }
+        }
+      },
+      "stats": {
+        "llmCalls": 1,
+        "promptChars": 1541,
+        "responseChars": 1450,
+        "llmMs": 3433,
+        "syntheses": 1,
+        "programsActivated": 1,
+        "disagreements": 0,
+        "llmErrors": 0,
+        "estTokens": 748
+      },
+      "hrTrace": [
+        {
+          "attempts": 1,
+          "converged": true
+        }
+      ],
+      "wallMs": 3439,
+      "records": [
+        {
+          "phase": "B",
+          "idx": 0,
+          "kind": "valido",
+          "cls": "correct",
+          "wrong": [],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0000",
+            "value_in_usd": 3041.33,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 1,
+          "kind": "negativo",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0001",
+            "value_in_usd": -4898.15,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 2,
+          "kind": "zero",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0002",
+            "value_in_usd": 0,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 3,
+          "kind": "valido",
+          "cls": "correct",
+          "wrong": [],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0003",
+            "value_in_usd": 958.9,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 4,
+          "kind": "negativo",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0004",
+            "value_in_usd": -1386.32,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 5,
+          "kind": "zero",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0005",
+            "value_in_usd": 0,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 6,
+          "kind": "valido",
+          "cls": "correct",
+          "wrong": [],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0006",
+            "value_in_usd": 4081.97,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 7,
+          "kind": "negativo",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0007",
+            "value_in_usd": -3421.08,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 8,
+          "kind": "zero",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0008",
+            "value_in_usd": 0,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 9,
+          "kind": "valido",
+          "cls": "correct",
+          "wrong": [],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0009",
+            "value_in_usd": 851.85,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 10,
+          "kind": "negativo",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0010",
+            "value_in_usd": -1700.13,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 11,
+          "kind": "zero",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0011",
+            "value_in_usd": 0,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 12,
+          "kind": "valido",
+          "cls": "correct",
+          "wrong": [],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0012",
+            "value_in_usd": 3860.45,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 13,
+          "kind": "negativo",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0013",
+            "value_in_usd": -3806.03,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 14,
+          "kind": "zero",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0014",
+            "value_in_usd": 0,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 15,
+          "kind": "valido",
+          "cls": "correct",
+          "wrong": [],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0015",
+            "value_in_usd": 2840.24,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 16,
+          "kind": "negativo",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0016",
+            "value_in_usd": -1381.45,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 17,
+          "kind": "zero",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0017",
+            "value_in_usd": 0,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 18,
+          "kind": "valido",
+          "cls": "correct",
+          "wrong": [],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0018",
+            "value_in_usd": 1594.86,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 19,
+          "kind": "negativo",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0019",
+            "value_in_usd": -2558.69,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 20,
+          "kind": "zero",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0020",
+            "value_in_usd": 0,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 21,
+          "kind": "valido",
+          "cls": "correct",
+          "wrong": [],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0021",
+            "value_in_usd": 844.96,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 22,
+          "kind": "negativo",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0022",
+            "value_in_usd": -1225.91,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 23,
+          "kind": "zero",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0023",
+            "value_in_usd": 0,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 24,
+          "kind": "valido",
+          "cls": "correct",
+          "wrong": [],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0024",
+            "value_in_usd": 4938.56,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 25,
+          "kind": "negativo",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0025",
+            "value_in_usd": -3048.27,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 26,
+          "kind": "zero",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0026",
+            "value_in_usd": 0,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 27,
+          "kind": "valido",
+          "cls": "correct",
+          "wrong": [],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0027",
+            "value_in_usd": 3711.89,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 28,
+          "kind": "negativo",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0028",
+            "value_in_usd": -4624.93,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 29,
+          "kind": "zero",
+          "cls": "corrupt",
+          "wrong": [
+            "<should-reject>"
+          ],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0029",
+            "value_in_usd": 0,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        }
+      ]
+    },
+    {
+      "approach": "IDAE telos correto (Haiku 4.5)",
+      "domain": "financeiro",
+      "n": 30,
+      "total": {
+        "n": 30,
+        "accepted": 1,
+        "correct": 1,
+        "corrupt": 0,
+        "correctReject": 20,
+        "falseReject": 9,
+        "fieldErrors": {},
+        "shouldReject": 20
+      },
+      "totalRates": {
+        "n": 30,
+        "accuracy": 0.7,
+        "correctRate": 0.03333333333333333,
+        "corruptRate": 0,
+        "corruptAmongAccepted": 0,
+        "falseRejectRate": 0.3,
+        "acceptRate": 0.03333333333333333
+      },
+      "perPhase": {
+        "B": {
+          "n": 30,
+          "accepted": 1,
+          "correct": 1,
+          "corrupt": 0,
+          "correctReject": 20,
+          "falseReject": 9,
+          "fieldErrors": {},
+          "shouldReject": 20,
+          "rates": {
+            "n": 30,
+            "accuracy": 0.7,
+            "correctRate": 0.03333333333333333,
+            "corruptRate": 0,
+            "corruptAmongAccepted": 0,
+            "falseRejectRate": 0.3,
+            "acceptRate": 0.03333333333333333
+          }
+        }
+      },
+      "perKind": {
+        "valido": {
+          "n": 10,
+          "accepted": 1,
+          "correct": 1,
+          "corrupt": 0,
+          "correctReject": 0,
+          "falseReject": 9,
+          "fieldErrors": {},
+          "shouldReject": 0,
+          "rates": {
+            "n": 10,
+            "accuracy": 0.1,
+            "correctRate": 0.1,
+            "corruptRate": 0,
+            "corruptAmongAccepted": 0,
+            "falseRejectRate": 0.9,
+            "acceptRate": 0.1
+          }
+        },
+        "negativo": {
+          "n": 10,
+          "accepted": 0,
+          "correct": 0,
+          "corrupt": 0,
+          "correctReject": 10,
+          "falseReject": 0,
+          "fieldErrors": {},
+          "shouldReject": 10,
+          "rates": {
+            "n": 10,
+            "accuracy": 1,
+            "correctRate": 0,
+            "corruptRate": 0,
+            "corruptAmongAccepted": 0,
+            "falseRejectRate": 0,
+            "acceptRate": 0
+          }
+        },
+        "zero": {
+          "n": 10,
+          "accepted": 0,
+          "correct": 0,
+          "corrupt": 0,
+          "correctReject": 10,
+          "falseReject": 0,
+          "fieldErrors": {},
+          "shouldReject": 10,
+          "rates": {
+            "n": 10,
+            "accuracy": 1,
+            "correctRate": 0,
+            "corruptRate": 0,
+            "corruptAmongAccepted": 0,
+            "falseRejectRate": 0,
+            "acceptRate": 0
+          }
+        }
+      },
+      "stats": {
+        "llmCalls": 4,
+        "promptChars": 7287,
+        "responseChars": 6249,
+        "llmMs": 15454,
+        "syntheses": 4,
+        "programsActivated": 1,
+        "disagreements": 0,
+        "llmErrors": 0,
+        "estTokens": 3384
+      },
+      "hrTrace": [
+        {
+          "attempts": 1,
+          "converged": true
+        },
+        {
+          "attempts": 3,
+          "converged": false
+        }
+      ],
+      "wallMs": 15460,
+      "records": [
+        {
+          "phase": "B",
+          "idx": 0,
+          "kind": "valido",
+          "cls": "correct",
+          "wrong": [],
+          "reason": null,
+          "output": {
+            "audit_id": "MIS0000",
+            "value_in_usd": 3041.33,
+            "date": "15/06/2024",
+            "category": "international",
+            "status": "valid"
+          }
+        },
+        {
+          "phase": "B",
+          "idx": 1,
+          "kind": "negativo",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "ttl-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 2,
+          "kind": "zero",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 3,
+          "kind": "valido",
+          "cls": "falseReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 4,
+          "kind": "negativo",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 5,
+          "kind": "zero",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 6,
+          "kind": "valido",
+          "cls": "falseReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 7,
+          "kind": "negativo",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 8,
+          "kind": "zero",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 9,
+          "kind": "valido",
+          "cls": "falseReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 10,
+          "kind": "negativo",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 11,
+          "kind": "zero",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 12,
+          "kind": "valido",
+          "cls": "falseReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 13,
+          "kind": "negativo",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 14,
+          "kind": "zero",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 15,
+          "kind": "valido",
+          "cls": "falseReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 16,
+          "kind": "negativo",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 17,
+          "kind": "zero",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 18,
+          "kind": "valido",
+          "cls": "falseReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 19,
+          "kind": "negativo",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 20,
+          "kind": "zero",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 21,
+          "kind": "valido",
+          "cls": "falseReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 22,
+          "kind": "negativo",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 23,
+          "kind": "zero",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 24,
+          "kind": "valido",
+          "cls": "falseReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 25,
+          "kind": "negativo",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 26,
+          "kind": "zero",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 27,
+          "kind": "valido",
+          "cls": "falseReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 28,
+          "kind": "negativo",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        },
+        {
+          "phase": "B",
+          "idx": 29,
+          "kind": "zero",
+          "cls": "correctReject",
+          "wrong": [],
+          "reason": "format-exhausted",
+          "output": null
+        }
+      ]
+    }
+  ]
+}

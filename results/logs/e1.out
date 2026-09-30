@@ -1,0 +1,11 @@
+
+=== E1 — cadeia ===
+abordagem                             n  correto  corrupção  rej.corr  rej.falsa  chamadas  tokens~
+IDAE-cadeia (4 intenções)          1000    69.8%      29.7%         0          5        56    24991
+P1 correto 200/200 corrupção 0 campos {} caminhos {"[1,2,3,4]":200}
+P2 correto 200/200 corrupção 0 campos {} caminhos {"[1,3,4]":200}
+P3 correto 50/200 corrupção 150 campos {"value_in_usd":150,"category":50} caminhos {"[1,2,3,4]":200}
+P4 correto 200/200 corrupção 0 campos {} caminhos {"[1,4]":200}
+P5 correto 48/200 corrupção 147 campos {"value_in_usd":147,"category":49,"date":1} caminhos {"rejeitado:systemic:1/F2":5,"[1,2,3,4]":195}
+stats {"llmCalls":56,"promptChars":71497,"responseChars":28465,"llmMs":183393,"programsGenerated":{"1":40,"2":1,"3":2,"4":1},"validatorReconstructions":{"1":2},"adaptations":9,"compressions":{"2":2,"3":1},"reactivations":3,"chainPaths":{"[1,2,3,4]":595,"[1,3,4]":200,"[1,4]":200},"systemicErrors":5,"telosFailures":0}
+arquivo: results/e1-cadeia.json

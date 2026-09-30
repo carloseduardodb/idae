@@ -1,0 +1,20 @@
+{
+  "name": "idae",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Reavaliação experimental do IDAE com oráculo de verdade-terreno (Claude Opus 4.5)",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "test": "TZ=America/Sao_Paulo node --no-warnings --test tests/*.test.js",
+    "smoke": "node --no-warnings experiments/smoke.js",
+    "e1": "node --no-warnings experiments/e1-cadeia.js",
+    "e2": "node --no-warnings experiments/e2-baselines.js",
+    "e3": "node --no-warnings experiments/e3-usgs.js",
+    "e4": "node --no-warnings experiments/e4-ablacao.js",
+    "e5": "node --no-warnings experiments/e5-repeticoes.js",
+    "e6": "node --no-warnings experiments/e6-ttl-hr.js",
+    "e7": "node --no-warnings experiments/e7-deriva.js",
+    "report": "node --no-warnings experiments/report.js"
+  }
+}

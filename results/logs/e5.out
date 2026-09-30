@@ -1,0 +1,13 @@
+[financeiro run 1] IDAE (original): ok 250/280 corr 0 fr 9 calls 17 | IDAE+: ok 259/280 corr 0 fr 0 calls 20 | IDAE sem validator: ok 250/280 corr 0 fr 9 calls 17 | LLM-Direct: ok 9/30 corr 0 fr 0 calls 30
+[financeiro run 4] IDAE (original): ok 250/280 corr 3 fr 9 calls 15 | IDAE+: ok 259/280 corr 0 fr 0 calls 20 | IDAE sem validator: ok 250/280 corr 3 fr 9 calls 15 | LLM-Direct: ok 9/30 corr 0 fr 0 calls 30
+[financeiro run 3] IDAE (original): ok 250/280 corr 0 fr 9 calls 17 | IDAE+: ok 259/280 corr 0 fr 0 calls 21 | IDAE sem validator: ok 250/280 corr 0 fr 9 calls 17 | LLM-Direct: ok 9/30 corr 0 fr 0 calls 30
+[financeiro run 2] IDAE (original): ok 250/280 corr 0 fr 9 calls 18 | IDAE+: ok 259/280 corr 0 fr 0 calls 22 | IDAE sem validator: ok 250/280 corr 0 fr 9 calls 17 | LLM-Direct: ok 9/30 corr 0 fr 0 calls 30
+[financeiro run 6] IDAE (original): ok 250/280 corr 0 fr 9 calls 17 | IDAE+: ok 259/280 corr 0 fr 0 calls 19 | IDAE sem validator: ok 250/280 corr 0 fr 9 calls 17 | LLM-Direct: ok 9/30 corr 0 fr 0 calls 30
+[financeiro run 5] IDAE (original): ok 250/280 corr 0 fr 9 calls 17 | IDAE+: ok 259/280 corr 0 fr 0 calls 21 | IDAE sem validator: ok 250/280 corr 0 fr 9 calls 17 | LLM-Direct: ok 9/30 corr 0 fr 0 calls 30
+[iot run 1] IDAE (original): ok 250/280 corr 0 fr 9 calls 20 | IDAE+: ok 259/280 corr 0 fr 0 calls 22 | IDAE sem validator: ok 250/280 corr 0 fr 9 calls 20 | LLM-Direct: ok 9/30 corr 0 fr 0 calls 30
+[iot run 2] IDAE (original): ok 250/280 corr 0 fr 9 calls 20 | IDAE+: ok 259/280 corr 0 fr 0 calls 22 | IDAE sem validator: ok 250/280 corr 0 fr 9 calls 20 | LLM-Direct: ok 9/30 corr 0 fr 0 calls 30
+[iot run 3] IDAE (original): ok 250/280 corr 0 fr 9 calls 20 | IDAE+: ok 259/280 corr 0 fr 0 calls 22 | IDAE sem validator: ok 250/280 corr 0 fr 9 calls 20 | LLM-Direct: ok 9/30 corr 0 fr 0 calls 30
+[iot run 4] IDAE (original): ok 250/280 corr 0 fr 9 calls 20 | IDAE+: ok 259/280 corr 0 fr 0 calls 22 | IDAE sem validator: ok 250/280 corr 0 fr 9 calls 20 | LLM-Direct: ok 9/30 corr 0 fr 0 calls 30
+[iot run 5] IDAE (original): ok 250/280 corr 0 fr 9 calls 20 | IDAE+: ok 259/280 corr 0 fr 0 calls 22 | IDAE sem validator: ok 250/280 corr 0 fr 9 calls 20 | LLM-Direct: ok 8/30 corr 1 fr 0 calls 30
+[iot run 6] IDAE (original): ok 250/280 corr 0 fr 9 calls 20 | IDAE+: ok 259/280 corr 0 fr 0 calls 22 | IDAE sem validator: ok 250/280 corr 0 fr 9 calls 20 | LLM-Direct: ok 9/30 corr 0 fr 0 calls 30
+arquivo: results/e5-repeticoes.json

@@ -1,0 +1,15 @@
+
+=== E2 — financeiro (claude-haiku-4.5) ===
+abordagem                             n  correto  corrupção  rej.corr  rej.falsa  chamadas  tokens~
+Schema-Based                        550    19.1%       0.0%        35        410         0        0
+IDAE                                550    51.3%      21.5%        35        115        19    16969
+LLM-Direct                          150    59.3%      20.7%        30          0       150    59291
+LLM+Val+Retry                       150    59.3%      17.3%        35          0       160    63506
+
+=== E2 — iot (claude-haiku-4.5) ===
+abordagem                             n  correto  corrupção  rej.corr  rej.falsa  chamadas  tokens~
+Schema-Based                        550    19.1%       0.0%        35        410         0        0
+IDAE                                550    72.7%       0.0%        35        115        22    25914
+LLM-Direct                          150    62.0%      21.3%        25          0       150    76104
+LLM+Val+Retry                       150    62.0%      14.7%        35          0       170    86613
+arquivo: results/e2-baselines-claude-haiku-4.5.json

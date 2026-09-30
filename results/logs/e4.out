@@ -1,0 +1,21 @@
+
+=== E4 — financeiro ===
+abordagem                             n  correto  corrupção  rej.corr  rej.falsa  chamadas  tokens~
+IDAE (original)                     550    90.9%       0.9%        30         15        16    14035
+sem validator                       550    90.9%       0.9%        30         15        17    14831
+validator ancorado                  550    90.9%       0.0%        35         15        17    15019
+rejeição explícita                  550    92.7%       0.9%        35          0         8     6896
+N-version (k=2)                     550    90.9%       0.0%        35         15        22    19276
+IDAE+ (ancorado+rejeição+NV2)       550    92.7%       0.0%        35          5        25    21908
+sem amortização                     150    76.7%       0.0%        35          0       220   187027
+
+=== E4 — iot ===
+abordagem                             n  correto  corrupção  rej.corr  rej.falsa  chamadas  tokens~
+IDAE (original)                     550    90.9%       0.0%        35         15        20    23876
+sem validator                       550    90.9%       0.0%        35         15        20    23807
+validator ancorado                  550    90.9%       0.0%        35         15        20    23343
+rejeição explícita                  550    93.6%       0.0%        35          0         9    10749
+N-version (k=2)                     550    90.9%       0.0%        35         15        25    29624
+IDAE+ (ancorado+rejeição+NV2)       550    93.6%       0.0%        35          0        30    35839
+sem amortização                     150    76.7%       0.0%        35          0       220   255249
+arquivo: results/e4-ablacao.json

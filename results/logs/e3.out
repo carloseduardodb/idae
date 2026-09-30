@@ -1,0 +1,42 @@
+
+=== E3 — USGS ===
+abordagem                             n  correto  corrupção  rej.corr  rej.falsa  chamadas  tokens~
+IDAE [telos corrigido]              560   100.0%       0.0%         0          0         2     2654
+IDAE+ [telos corrigido]             560   100.0%       0.0%         0          0         4     5588
+LLM-Direct [telos corrigido]        560    62.7%      37.3%         0          0       560   324944
+IDAE [telos original]               560    40.4%      59.6%         0          0         5     6761
+LLM-Direct [telos original]         560     2.0%      98.0%         0          0       560   295386
+{
+ "IDAE [telos original]": {
+  "csvAcceptedWithFabricatedSignificance": 330,
+  "fabricatedValues": {
+   "0": 327,
+   "1": 2,
+   "2": 1
+  },
+  "negativeDepthEvents": 11,
+  "negativeDepthRejected": 0
+ },
+ "LLM-Direct [telos original]": {
+  "csvAcceptedWithFabricatedSignificance": 330,
+  "fabricatedValues": {
+   "5": 2,
+   "6": 2,
+   "19": 1,
+   "34": 1,
+   "38": 1,
+   "46": 2,
+   "49": 1,
+   "156": 1,
+   "null": 319
+  },
+  "negativeDepthEvents": 11,
+  "negativeDepthRejected": 0
+ }
+}
+IDAE [telos corrigido] erros por campo {} por fase P1:100/100 P2:200/200 P3:100/100 P4:100/100 P5:60/60
+IDAE+ [telos corrigido] erros por campo {} por fase P1:100/100 P2:200/200 P3:100/100 P4:100/100 P5:60/60
+LLM-Direct [telos corrigido] erros por campo {"timestamp_utc":208,"place":1} por fase P1:13/100 P2:200/200 P3:6/100 P4:99/100 P5:33/60
+IDAE [telos original] erros por campo {"<should-reject>":334} por fase P1:100/100 P2:0/200 P3:96/100 P4:0/100 P5:30/60
+LLM-Direct [telos original] erros por campo {"timestamp_utc":215,"<should-reject>":334} por fase P1:9/100 P2:0/200 P3:1/100 P4:0/100 P5:1/60
+arquivo: results/e3-usgs.json

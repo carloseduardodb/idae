@@ -1,0 +1,18 @@
+
+=== E7-C — deriva 80% sem moeda ===
+abordagem                             n  correto  corrupção  rej.corr  rej.falsa  chamadas  tokens~
+IDAE (original)                     100    20.0%       0.0%        80          0         4     3468
+IDAE + rejeição explícita           100    20.0%      78.0%         2          0         4     3716
+LLM-Direct                          100    20.0%       0.0%        80          0       100    37431
+
+=== E7-C — deriva 20% sem moeda ===
+abordagem                             n  correto  corrupção  rej.corr  rej.falsa  chamadas  tokens~
+IDAE (original)                     100    78.0%       0.0%        22          0         4     3286
+IDAE + rejeição explícita           100    78.0%      21.0%         1          0         3     2506
+LLM-Direct                          100    78.0%       0.0%        22          0       100    39216
+
+=== E7-C — deriva 5% sem moeda ===
+abordagem                             n  correto  corrupção  rej.corr  rej.falsa  chamadas  tokens~
+IDAE (original)                     100    93.0%       0.0%         7          0         4     3357
+IDAE + rejeição explícita           100    93.0%       0.0%         7          0         8     6849
+LLM-Direct                          100    93.0%       0.0%         7          0       100    39666
