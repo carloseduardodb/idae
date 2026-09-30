@@ -7,6 +7,8 @@ Realmente Garante — um Estudo com Extração de Dados* —
 [doi.org/10.5281/zenodo.23050792](https://doi.org/10.5281/zenodo.23050792)
 (PDF e fonte LaTeX em `article/old/`).
 
+Autor: Carlos Eduardo Dias Batista — ORCID [0009-0005-5726-0289](https://orcid.org/0009-0005-5726-0289)
+
 Implementação e avaliação experimental do IDAE, com oráculo de verdade-terreno.
 O IDAE sintetiza, com um LLM, programas de extração descartáveis sob uma
 especificação imutável (o *telos*) e os reutiliza por formato de entrada.
