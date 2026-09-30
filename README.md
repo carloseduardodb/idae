@@ -1,10 +1,10 @@
 # IDAE — Intent-Driven Adaptive Extraction
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23050792.svg)](https://doi.org/10.5281/zenodo.23050792)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23050791.svg)](https://doi.org/10.5281/zenodo.23050791)
 
 Artigo: *Programas Descartáveis sob Especificação Imutável: o que um Validator
 Realmente Garante — um Estudo com Extração de Dados* —
-[doi.org/10.5281/zenodo.23050792](https://doi.org/10.5281/zenodo.23050792)
+[doi.org/10.5281/zenodo.23050791](https://doi.org/10.5281/zenodo.23050791)
 (PDF e fonte LaTeX em `article/old/`).
 
 Autor: Carlos Eduardo Dias Batista — ORCID [0009-0005-5726-0289](https://orcid.org/0009-0005-5726-0289)
@@ -52,7 +52,7 @@ idae/
 |---|---|
 | E1 | A cadeia de 4 intenções com compressão e Fase 2 entrega o telos **correto**? |
 | E2 | IDAE vs Schema-Based, LLM-Direct e LLM+Val+Retry, com oráculo, em 2 domínios (Opus 4.5 e Haiku 4.5) |
-| E3 | Dados reais do USGS: telos corrigido vs telos original (fabricação) |
+| E3 | Dados reais do USGS: telos corrigido vs telos estrito (fabricação) |
 | E4 | Ablação: sem validator, sem amortização, validator ancorado, rejeição explícita, N-version |
 | E5 | 6 repetições independentes por domínio, com testes exatos |
 | E6 | H_r medido contra o oráculo por tentativa; sensibilidade de TTL (a partir dos traços de E4/E5) |

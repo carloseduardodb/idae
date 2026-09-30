@@ -4,7 +4,7 @@
 // dos campos-fonte (GeoJSON / CSV FDSN).
 //
 // Dois telos são avaliados:
-//   ORIGINAL  — o da avaliação preliminar: exige significance inteiro e depth >= 0.
+//   ORIGINAL  — telos estrito: exige significance inteiro e depth >= 0.
 //               O CSV do USGS não possui "sig"; qualquer valor aceito ali
 //               é fabricado. Profundidades negativas são válidas no USGS.
 //   CORRIGIDO — significance = null quando ausente na fonte; depth >= -10.

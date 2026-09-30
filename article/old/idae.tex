@@ -39,7 +39,7 @@ Pipelines de extração de dados quebram quando as fontes mudam de formato. O ID
 
 \textbf{Palavras-chave:} programação orientada a intenção, síntese de programas, extração de dados, LLM, corrupção silenciosa de dados, oráculo de teste.
 
-\noindent\textbf{DOI:} \url{https://doi.org/10.5281/zenodo.23050792}
+\noindent\textbf{DOI:} \url{https://doi.org/10.5281/zenodo.23050791}
 
 \section{Introdução}
 
@@ -92,7 +92,7 @@ A ``alucinação relativa ao validator'' --- saída aceita que viola $V_\iota$ -
 
 \subsection{Índice de Resolução ($H_r$)}
 
-O Índice de Resolução mede a fração de campos que ainda não atingem o objetivo após uma tentativa do Negotiator: $H_r = |\{f \in F : f \text{ incorreto}\}| / |F|$. Na formulação original, ``incorreto'' significava ``reprovado pelo validator''; aqui medimos também $H_r$ contra o oráculo, o que permite observar programas aprovados pelo validator com $H_r > 0$.
+O Índice de Resolução mede a fração de campos que ainda não atingem o objetivo após uma tentativa do Negotiator: $H_r = |\{f \in F : f \text{ incorreto}\}| / |F|$. Medido pelo validator, ``incorreto'' significa ``reprovado''; aqui medimos também $H_r$ contra o oráculo, o que permite observar programas aprovados pelo validator com $H_r > 0$.
 
 \section{Arquitetura do IDAE}
 \label{sec:arq}
@@ -132,7 +132,7 @@ Todos os registros sintéticos são gerados com sua verdade-terreno por um PRNG 
 
 \textbf{IoT} (telos: \texttt{device\_id}, \texttt{metric}, \texttt{value} na unidade canônica, \texttt{timestamp\_utc}, \texttt{status} derivado de limiares, \texttt{zone}): JSON limpo; fornecedor com campos e zonas codificados; Fahrenheit; pipe legado (F, \%, mbar); CSV em Kelvin. As variantes adversariais incluem métrica, timestamp ou zona ausentes, valor \texttt{"NaN"}, valores fisicamente impossíveis e registro financeiro.
 
-\textbf{USGS}: os mesmos 560 eventos reais do USGS Earthquake Catalog usados na avaliação preliminar (GeoJSON M4+, CSV de redes mistas, GeoJSON de micro-eventos, CSV bruto e fluxo misto intercalado). O oráculo é derivado deterministicamente dos campos-fonte. Avaliamos dois telos: o \textit{original}, que exige \texttt{significance} inteiro e profundidade $\geq 0$, e um \textit{corrigido}, com \texttt{significance} nulo quando ausente na fonte (o CSV do USGS não tem o campo \texttt{sig}) e profundidade $\geq -10$ km (o USGS registra profundidades negativas, acima do datum).
+\textbf{USGS}: 560 eventos reais do USGS Earthquake Catalog (GeoJSON M4+, CSV de redes mistas, GeoJSON de micro-eventos, CSV bruto e fluxo misto intercalado). O oráculo é derivado deterministicamente dos campos-fonte. Avaliamos dois telos: o \textit{estrito}, que exige \texttt{significance} inteiro e profundidade $\geq 0$, e um \textit{corrigido}, com \texttt{significance} nulo quando ausente na fonte (o CSV do USGS não tem o campo \texttt{sig}) e profundidade $\geq -10$ km (o USGS registra profundidades negativas, acima do datum).
 
 \subsection{Abordagens}
 
@@ -142,7 +142,7 @@ Todas recebem \textbf{o mesmo texto de especificação}, incluindo a regra de re
 \item \textbf{Schema-Based}: parser determinístico escrito à mão para o formato da Fase~1.
 \item \textbf{LLM-Direct}: uma chamada por registro; o LLM devolve o JSON final ou \texttt{null}; sem validator.
 \item \textbf{LLM+Val+Retry}: como o LLM-Direct, mas com o validator do telos como portão e até 3 tentativas; sem amortização.
-\item \textbf{IDAE}: reimplementação fiel do runner da avaliação preliminar (síntese com TTL = 3, validator como portão, amortização, marcação de formato esgotado), com programas indexados por assinatura de formato.
+\item \textbf{IDAE}: síntese com TTL = 3, validator como portão, amortização, marcação de formato esgotado, com programas indexados por assinatura de formato.
 \item \textbf{IDAE-cadeia}: porte fiel do experimento de cadeia (4 intenções, compressão, Fase~2), incluindo seus prompts.
 \item \textbf{Variantes} (E4, E5): sem validator; sem amortização; \textit{validator ancorado} (o identificador deve aparecer literalmente na entrada e, no IoT, o \texttt{status} deve ser coerente com o valor); \textit{rejeição explícita amortizada} (\texttt{null} do programa rejeita o registro sem descartar o programa, e um programa que rejeita é mantido para o formato); \textit{N-version} com $k=2$ (dois programas independentes devem concordar); e \textit{IDAE+}, que combina as três.
 \end{itemize}
@@ -152,28 +152,6 @@ Todas recebem \textbf{o mesmo texto de especificação}, incluindo a regra de re
 O modelo principal é o \textbf{Claude Opus 4.5} (identificador \texttt{claude-opus-4.5}). O \textbf{Claude Haiku 4.5} é usado como modelo menor na análise de sensibilidade. Os programas sintetizados executam em sandbox (\texttt{node:vm}, timeout de 1\,s) com fuso horário fixo (\texttt{America/\allowbreak Sao\_Paulo}), de modo que o uso de datas locais em vez de UTC produz erro observável. Todo prompt e toda resposta são registrados em JSONL. Tokens são estimados como caracteres/4.
 
 No E2, as abordagens por registro rodam numa subamostra estável (20 registros por fase normal e toda a fase adversarial, $n = 150$ por domínio); o IDAE e o Schema-Based rodam no fluxo completo (100 por fase e 50 adversariais, $n = 550$) e também são reportados na subamostra, pareados registro a registro. Comparações pareadas usam McNemar exato; comparações entre execuções usam Wilcoxon signed-rank exato e o $\delta$ de Cliff \cite{arcuri2011practical}; proporções têm IC de Wilson a 95\%.
-
-\subsection{Relação com a avaliação preliminar}
-
-Uma avaliação preliminar do IDAE mediu ``alucinação'' apenas para os baselines --- o runner do IDAE não invocava o detector ---, usou um baseline ``LLM-Direct'' que também sintetizava código com cache e o mesmo validator, e aceitou como válidos registros USGS com campos fabricados. Os experimentos aqui reproduzem os mesmos cenários sob o oráculo e substituem aqueles resultados. A Tabela~\ref{tab:erratum} resume as diferenças.
-
-\begin{table}[h]
-\caption{Afirmações da avaliação preliminar e o que o oráculo mostra}
-\label{tab:erratum}
-\resizebox{\columnwidth}{!}{%
-\begin{tabular}{p{0.45\columnwidth}p{0.55\columnwidth}}
-\toprule
-\textbf{Afirmação preliminar} & \textbf{Com oráculo (este trabalho)} \\
-\midrule
-IDAE: 0\% de alucinação ``arquitetural'' & Medida por construção; com Haiku 4.5, 21,5\% de corrupção (E2) \\
-LLM-Direct: 40\% de alucinação adversarial & Com Opus 4.5 e a mesma especificação, 0/35 inválidos aceitos (E2) \\
-USGS: 98,8\% com 2 chamadas vs 69,1\% com 186 & Telos original força fabricação (334 registros); telos corrigido: 100\% vs 62,7\% (560 chamadas) \\
-7 rejeições USGS por magnitude nula & Nenhuma magnitude nula; eram profundidades negativas válidas \\
-Fase~2 recupera entradas & Fase~2 induziu 74\% de corrupção nas fases em que atuou (E1) \\
-Cadeia: 5.000/5.000 no telos & 69,8\% corretos; 29,7\% corrupção silenciosa (E1) \\
-\bottomrule
-\end{tabular}}
-\end{table}
 
 \section{Resultados}
 
@@ -226,7 +204,7 @@ As corrupções concentram-se \textbf{exatamente nas fases em que a Fase~2 atuou
 
 \textbf{Com o Opus 4.5, o IDAE não cometeu nenhum erro de valor} em 1.100 registros e usou 11--14$\times$ menos tokens por registro que a transformação por registro --- diferença que cresce com $N$, pois o custo do IDAE depende de $k$ e não de $N$. As corrupções do LLM-Direct são do tipo que um validator de formato não detecta: aritmética errada na conversão Fahrenheit$\to$Celsius ($-4{,}54$ em vez de $-3{,}99$) e a linha pipe inteira copiada como identificador. O LLM+Val+Retry comete os mesmos erros, o que confirma que o validator de formato não os filtra; o programa sintetizado, por fazer a aritmética em código, não erra.
 
-\textbf{A alucinação adversarial não se reproduziu.} Com a mesma especificação e a regra de rejeição explícita, as três abordagens baseadas em LLM rejeitaram corretamente as 35 entradas inválidas de cada domínio --- inclusive o LLM-Direct, sem validator. O valor de 40\% reportado anteriormente não é uma propriedade do LLM-Direct, e sim do modelo, do prompt e da forma de medir.
+\textbf{Entradas inválidas foram rejeitadas por todos.} Com a mesma especificação e a regra de rejeição explícita, as três abordagens baseadas em LLM rejeitaram corretamente as 35 entradas inválidas de cada domínio --- inclusive o LLM-Direct, sem validator. Com a regra de rejeição na especificação, rejeitar entradas inválidas não dependeu do validator.
 
 \textbf{O IDAE rejeitou falsamente as 15 entradas adversariais aceitáveis} (moeda minúscula com valor em string, número brasileiro, virada de dia em UTC; pressão em kPa, vírgula decimal, limite crítico). Elas compartilham a assinatura de formato de registros inválidos que as precederam. Como o IDAE não distingue ``o programa falhou'' de ``o registro é inválido'', um registro inválido faz o programa vigente ser descartado, a Fase~1 esgota o TTL tentando satisfazer o validator com um registro que não deve ser satisfeito, e o formato é marcado como esgotado: os registros válidos seguintes daquele formato são rejeitados sem nova síntese. Chamamos esse efeito de \textbf{envenenamento de formato}. Na subamostra pareada, o LLM-Direct tomou mais decisões corretas que o IDAE (McNemar exato: 15 vs 6, $p = 0{,}078$ no financeiro; 15 vs 1, $p < 0{,}001$ no IoT), inteiramente por causa desse efeito.
 
@@ -267,7 +245,7 @@ O validator do telos reduziu a corrupção por registro (LLM-Direct $\to$ LLM+Va
  & IDAE+ & 100\% & 0\% & 4 & $\sim$5,6k \\
  & LLM-Direct & 62,7\% & 37,3\% & 560 & $\sim$325k \\
 \midrule
-\multirow{2}{*}{Original} & IDAE & 40,4\% & 59,6\% & 5 & $\sim$6,8k \\
+\multirow{2}{*}{Estrito} & IDAE & 40,4\% & 59,6\% & 5 & $\sim$6,8k \\
  & LLM-Direct & 2,0\% & 98,0\% & 560 & $\sim$295k \\
 \bottomrule
 \end{tabular}}
@@ -275,7 +253,7 @@ O validator do telos reduziu a corrupção por registro (LLM-Direct $\to$ LLM+Va
 
 Com o telos corrigido, o IDAE converteu corretamente \textbf{todos os 560 eventos reais com 2 chamadas} (um programa para GeoJSON e outro para CSV, incluindo aspas com vírgulas no campo \texttt{place}), contra 62,7\% do LLM-Direct com 560 chamadas --- redução de $\sim$120$\times$ em tokens. Os 208 erros do LLM-Direct são de timestamp: o modelo converteu ``de cabeça'' o tempo em milissegundos desde a época para ISO~8601 e errou horas e dias. É o mesmo padrão do E2: aritmética feita pelo LLM erra, aritmética feita pelo programa sintetizado não erra.
 
-\textbf{O telos original induz fabricação.} Ele exige \texttt{significance} inteiro, campo inexistente no CSV do USGS. O IDAE aceitou 330 registros CSV com o valor inventado (327 com \texttt{significance = 0}) e aceitou os 11 eventos com profundidade negativa (7 deles entre os 330 do CSV, totalizando 334 corrupções) depois que o programa sintetizado \textbf{substituiu a profundidade por 0} para satisfazer a restrição $\geq 0$. Esse é um caso de \textit{validator hacking} pelo próprio programa: quando a especificação é insatisfatível para um dado real, o sintetizador encontra um programa que a satisfaz alterando o dado. Na avaliação preliminar, os mesmos 7 registros com profundidade negativa do CSV foram rejeitados e atribuídos a ``magnitude nula'' --- nenhum dos 560 eventos tem magnitude nula.
+\textbf{O telos estrito induz fabricação.} Ele exige \texttt{significance} inteiro, campo inexistente no CSV do USGS. O IDAE aceitou 330 registros CSV com o valor inventado (327 com \texttt{significance = 0}) e aceitou os 11 eventos com profundidade negativa (7 deles entre os 330 do CSV, totalizando 334 corrupções) depois que o programa sintetizado \textbf{substituiu a profundidade por 0} para satisfazer a restrição $\geq 0$. Esse é um caso de \textit{validator hacking} pelo próprio programa: quando a especificação é insatisfatível para um dado real, o sintetizador encontra um programa que a satisfaz alterando o dado.
 
 \subsection{E4 --- Ablação e variantes (RQ5)}
 
@@ -332,7 +310,7 @@ O E5 repete, com 6 sementes por domínio (50 registros por fase e 30 adversariai
 \end{tabular}}
 \end{table}
 
-O IDAE+ superou o IDAE original em correção e em rejeições falsas em \textbf{todas as 6 execuções dos dois domínios} (Wilcoxon exato, $p = 0{,}031$, o menor valor possível com $n = 6$; $\delta$ de Cliff $= 1{,}0$), ao custo de 2--4 chamadas a mais por execução ($p = 0{,}031$). O IDAE original teve corrupção em 1 das 6 execuções financeiras (3 registros sem moeda aceitos com moeda inventada). O LLM-Direct, na fase adversarial, teve corrupção em 1 das 6 execuções do IoT (1 registro) e em nenhuma do financeiro. As diferenças de corrupção entre abordagens não são significativas ($p = 1{,}0$): com o Opus 4.5 e a regra de rejeição na especificação, a corrupção é um evento raro para todas as abordagens nesses domínios. \textbf{A remoção do validator de formato não alterou nenhuma decisão em nenhuma das 12 execuções.} Em contraste com a avaliação preliminar, que reportou $p = 0{,}005$ para ``alucinação do LLM-Direct maior que a do IDAE'', aqui não há diferença detectável.
+O IDAE+ superou o IDAE original em correção e em rejeições falsas em \textbf{todas as 6 execuções dos dois domínios} (Wilcoxon exato, $p = 0{,}031$, o menor valor possível com $n = 6$; $\delta$ de Cliff $= 1{,}0$), ao custo de 2--4 chamadas a mais por execução ($p = 0{,}031$). O IDAE original teve corrupção em 1 das 6 execuções financeiras (3 registros sem moeda aceitos com moeda inventada). O LLM-Direct, na fase adversarial, teve corrupção em 1 das 6 execuções do IoT (1 registro) e em nenhuma do financeiro. As diferenças de corrupção entre abordagens não são significativas ($p = 1{,}0$): com o Opus 4.5 e a regra de rejeição na especificação, a corrupção é um evento raro para todas as abordagens nesses domínios. \textbf{A remoção do validator de formato não alterou nenhuma decisão em nenhuma das 12 execuções.}
 
 \subsection{E6 --- $H_r$ e sensibilidade de TTL (RQ6)}
 
@@ -360,7 +338,7 @@ Registramos, a cada tentativa de síntese em E4 e E5 (exceto a variante sem amor
 
 \textbf{Implicações práticas.} (1) Escreva telos satisfatíveis pelos dados reais --- campos opcionais devem ser anuláveis. (2) Inclua na especificação a regra de rejeição. (3) Valide programas sintetizados contra invariantes verificáveis sem oráculo (ancoragem na entrada, coerência entre campos) e, quando o custo permitir, contra uma segunda versão independente \cite{avizienis1985nversion}, lembrando que versões geradas pelo mesmo modelo não são independentes \cite{knight1986experimental}. (4) Amostre e audite os programas amortizados: o custo de auditar $k$ programas é pequeno em relação a auditar $N$ registros.
 
-\textbf{Para além da extração de dados.} Nada no mecanismo avaliado é específico de dados. O IDAE é uma instância de um padrão mais geral, que chamamos de \textit{programas descartáveis sob especificação imutável}: um LLM sintetiza um programa por classe de entrada, uma especificação executável fixa decide se ele é aceito, e o programa é reaproveitado até que a classe mude. Nossos resultados sugerem três condições para que o padrão compense. (i) \textit{Especificação verificável e forte}: um validator de formato não alterou nenhuma decisão (E4, E5), enquanto a ancoragem na entrada e o N-version detectaram erros; o benefício cresce à medida que o validator se aproxima de um oráculo. (ii) \textit{Poucas classes e muitos casos por classe} ($k \ll N$): é daí que vem a redução de custo; se cada entrada é única, o padrão degenera em chamar o LLM por caso. (iii) \textit{Erro auditável}: como um programa errado erra de forma sistemática em toda a sua classe, o domínio precisa permitir inspecionar ou amostrar os $k$ programas. Domínios candidatos que satisfazem essas condições incluem a migração de código com teste diferencial, em que o sistema legado serve de oráculo; adaptadores entre serviços sob testes de contrato; e configuração de infraestrutura sob políticas como código. Onde a especificação é ambígua ou não verificável, o padrão oferece confiança falsa, como o telos original do USGS ilustra (E3). Esta avaliação cobre apenas extração de dados; a generalidade do padrão é uma hipótese, não um resultado deste trabalho.
+\textbf{Para além da extração de dados.} Nada no mecanismo avaliado é específico de dados. O IDAE é uma instância de um padrão mais geral, que chamamos de \textit{programas descartáveis sob especificação imutável}: um LLM sintetiza um programa por classe de entrada, uma especificação executável fixa decide se ele é aceito, e o programa é reaproveitado até que a classe mude. Nossos resultados sugerem três condições para que o padrão compense. (i) \textit{Especificação verificável e forte}: um validator de formato não alterou nenhuma decisão (E4, E5), enquanto a ancoragem na entrada e o N-version detectaram erros; o benefício cresce à medida que o validator se aproxima de um oráculo. (ii) \textit{Poucas classes e muitos casos por classe} ($k \ll N$): é daí que vem a redução de custo; se cada entrada é única, o padrão degenera em chamar o LLM por caso. (iii) \textit{Erro auditável}: como um programa errado erra de forma sistemática em toda a sua classe, o domínio precisa permitir inspecionar ou amostrar os $k$ programas. Domínios candidatos que satisfazem essas condições incluem a migração de código com teste diferencial, em que o sistema legado serve de oráculo; adaptadores entre serviços sob testes de contrato; e configuração de infraestrutura sob políticas como código. Onde a especificação é ambígua ou não verificável, o padrão oferece confiança falsa, como o telos estrito do USGS ilustra (E3). Esta avaliação cobre apenas extração de dados; a generalidade do padrão é uma hipótese, não um resultado deste trabalho.
 
 \section{Trabalhos Relacionados}
 
@@ -395,7 +373,7 @@ Trabalhos futuros: instanciar o padrão em um segundo domínio com especificaç�
 \section*{Disponibilidade de Artefatos}
 \label{sec:artifacts}
 
-O pacote de artefatos contém: implementação do IDAE, da cadeia de intenções e de todas as abordagens; geradores com semente e oráculos; os 560 eventos do USGS; scripts dos experimentos E1--E7; testes unitários; resultados brutos por registro; e o log JSONL de todos os prompts e respostas dos modelos. Os artefatos estão disponíveis em \url{https://github.com/carloseduardodb/idae}. Este artigo está arquivado no Zenodo sob o DOI \href{https://doi.org/10.5281/zenodo.23050792}{10.5281/zenodo.23050792}.
+O pacote de artefatos contém: implementação do IDAE, da cadeia de intenções e de todas as abordagens; geradores com semente e oráculos; os 560 eventos do USGS; scripts dos experimentos E1--E7; testes unitários; resultados brutos por registro; e o log JSONL de todos os prompts e respostas dos modelos. Os artefatos estão disponíveis em \url{https://github.com/carloseduardodb/idae}. Este artigo está arquivado no Zenodo sob o DOI \href{https://doi.org/10.5281/zenodo.23050791}{10.5281/zenodo.23050791}.
 
 \section*{Declaração de Uso de IA Generativa}
 
