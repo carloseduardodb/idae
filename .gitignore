@@ -2,3 +2,5 @@ node_modules/
 src/*.local.js
 *.aux
 *.log
+article/arxiv/arxiv-source.tar.gz
+article/arxiv/endorsement-emails.md

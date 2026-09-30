@@ -1,0 +1,494 @@
+\documentclass[sigconf,nonacm]{acmart}
+
+\settopmatter{printacmref=false}
+\renewcommand\footnotetextcopyrightpermission[1]{}
+\setcopyright{none}
+\emergencystretch=1em
+
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{multirow}
+
+\begin{document}
+
+\title[Disposable Programs under an Immutable Specification]{Disposable Programs under an Immutable Specification: What a Validator Actually Guarantees --- A Study on Data Extraction}
+
+\author{Carlos Eduardo Dias Batista}
+\orcid{0009-0005-5726-0289}
+\affiliation{
+  \institution{Independent Researcher}
+  \country{Brazil}
+}
+
+\renewcommand{\shortauthors}{Batista}
+
+\begin{abstract}
+Data extraction pipelines break when sources change format. Intent-Driven Adaptive Extraction (IDAE) makes the extraction program a disposable artifact synthesized by an LLM, while an immutable final intention (the \textit{telos}), checked by a validator, is the permanent artifact; approved programs are reused for every record of the same format. We evaluate IDAE with a ground-truth oracle for every record, applied equally to all approaches, which separates \textit{acceptance by the validator} from \textit{correctness}. Seven experiments cover two synthetic domains, 560 real USGS earthquake records, two models (Claude Opus 4.5 and Claude Haiku 4.5) and six repetitions per domain. With Opus 4.5, IDAE converted all 560 USGS records correctly with 2 LLM calls, whereas per-record LLM transformation reached 62.7\% with 560 calls and $\sim$120$\times$ more tokens. The oracle, however, refutes the claim that zero hallucination is an architectural property: with Haiku 4.5, one faulty program amortized over its format corrupted 98\% of a phase; reconstructing intermediate validators caused 74\% silent corruption in the phases where it fired; a telos requiring a field absent from the source led synthesized programs to fabricate it in 330 records and to clamp valid negative depths to zero; and, because IDAE cannot tell a failing program from an invalid record, a single invalid record can poison a whole format. Amortizing explicit rejections removes this effect at no extra cost. IDAE's guarantee is exactly as strong as its specification: it buys cost, determinism and auditability, not semantic correctness.
+\end{abstract}
+
+\keywords{Intent-Driven Programming, Program Synthesis, Data Extraction, Large Language Models, Silent Data Corruption, Test Oracle, Empirical Software Engineering}
+
+\frenchspacing
+\maketitle
+
+\noindent\textit{This English version is archived at} \url{https://doi.org/10.5281/zenodo.23062292}\textit{; the original Portuguese version is archived at} \url{https://doi.org/10.5281/zenodo.23050791}.
+
+\section{Introduction}
+
+Data extraction and transformation pipelines encode the \textit{process} of transformation: the program is the permanent artifact, while the intent --- what the final data should satisfy --- remains informal, scattered across documentation and the team's memory. When an API changes its schema or a source starts exporting a different format, someone has to rewrite the parser \cite{salehie2009self}. Industry discussions describe a shift from ``code-first'' to ``intent-first'' development \cite{shoukry2026future}, and the idea of raising the level of abstraction is rooted in declarative programming \cite{lloyd1994practical} and program synthesis \cite{gulwani2017program}.
+
+IDAE (\textit{Intent-Driven Adaptive Extraction}) applies this inversion to data extraction: the program is disposable, synthesized by an LLM from the intent, and the \textit{telos} --- the final intention, checked by a validator --- is immutable. Approved programs are reused (amortized) for every record of the same format; when the format changes, the program is discarded and a new one is synthesized.
+
+The strongest promise of this architecture is semantic: if every accepted record passes the telos validator, the system should not accept ``hallucinations''. That promise rests on a distinction that is often overlooked: \textbf{being accepted by the validator is not the same as being correct}. A validator checks format and declared constraints; it does not know the true value of each field --- the classic oracle problem in software testing \cite{barr2015oracle}. An evaluation that measures ``hallucination'' as ``validator failure'', or that measures hallucination only for the baselines, confirms the architecture by construction.
+
+This paper evaluates IDAE with a per-record ground-truth oracle, applied equally to all approaches, and answers six research questions:
+
+\begin{itemize}
+\item \textbf{RQ1} (correctness): do IDAE's mechanisms --- intention chain, compression, Phase~2 --- deliver the \textit{correct} telos, and not merely an accepted one?
+\item \textbf{RQ2} (cost): how much does program amortization reduce calls and tokens compared with per-record transformation, at comparable correctness?
+\item \textbf{RQ3} (semantic guarantee): does the validator prevent silent corruption? What does it depend on?
+\item \textbf{RQ4} (adversarial inputs and drift): how does IDAE behave when part of the records must be rejected?
+\item \textbf{RQ5} (components): what does each mechanism contribute, and what do variants that fix the observed failures contribute?
+\item \textbf{RQ6} (convergence): do the Resolution Index $H_r$ and the TTL describe the Negotiator's semantic convergence?
+\end{itemize}
+
+\subsection{Contributions}
+
+\begin{enumerate}
+\item \textbf{The IDAE framework}: an architecture with an immutable telos, disposable programs amortized per format, a two-phase intervention hierarchy and chain compression (Sections~\ref{sec:fund}--\ref{sec:arq}).
+\item \textbf{An oracle-based evaluation methodology}: an operational separation between acceptance and correctness (\textit{silent corruption}), the same specification for all approaches, exact statistical tests, and an auditable log of every model call (Section~\ref{sec:method}).
+\item \textbf{Evidence on cost}: on 560 real earthquake records, 100\% correctness with 2 calls versus 62.7\% with 560 calls for per-record transformation ($\sim$120$\times$ fewer tokens).
+\item \textbf{A refutation of the architectural guarantee}: IDAE's guarantee is exactly the strength of its specification. We document four mechanisms of silent corruption --- amortization of a faulty program, validator relaxation in Phase~2, fabrication induced by an ill-specified telos, and ``validator hacking'' by the synthesized program --- and one mechanism of false rejection, \textit{format poisoning}.
+\item \textbf{Design fixes}: amortized explicit rejection (which removes format poisoning at no extra cost) and grounded validation with N-version programming \cite{avizienis1985nversion}, assessed through ablation and repetitions.
+\end{enumerate}
+
+\section{Background}
+\label{sec:fund}
+
+\subsection{Intent as an executable specification}
+
+Given a telos $\iota$ with validator $V_\iota$ and an input $x$, IDAE looks for a program $\sigma$ such that $V_\iota(\sigma(x)) = \text{True}$. The program $\sigma$ is disposable; $\iota$ is permanent \cite{astrom1995adaptive,liskov2000program}. Unlike traditional program synthesis \cite{gulwani2017program}, the product is not the program but the certified data: $\sigma$ is discarded when it no longer satisfies $V_\iota$.
+
+\subsection{Acceptance, correctness and silent corruption}
+
+Let $y^\ast(x)$ be the true output for $x$ --- or $\bot$ if $x$ must be rejected. An approach either accepts with output $\hat{y}(x)$ or rejects. Per record, we define:
+
+\begin{itemize}
+\item \textbf{correct}: accepted and $\hat{y}(x) = y^\ast(x)$ (within a numeric tolerance);
+\item \textbf{silent corruption}: accepted and ($y^\ast(x) = \bot$ or $\hat{y}(x) \neq y^\ast(x)$);
+\item \textbf{correct rejection}: rejected and $y^\ast(x) = \bot$;
+\item \textbf{false rejection}: rejected and $y^\ast(x) \neq \bot$.
+\end{itemize}
+
+``Validator-relative hallucination'' --- an accepted output that violates $V_\iota$ --- is zero by definition in any system that filters by $V_\iota$. Silent corruption is the quantity that matters: wrong data that the system certifies as valid.
+
+\subsection{Resolution Index ($H_r$)}
+
+The Resolution Index measures the fraction of fields that still miss the goal after a Negotiator attempt: $H_r = |\{f \in F : f \text{ incorrect}\}| / |F|$. Measured by the validator, ``incorrect'' means ``rejected by the validator''; here we also measure $H_r$ against the oracle, which exposes programs approved by the validator with $H_r > 0$.
+
+\section{IDAE Architecture}
+\label{sec:arq}
+
+\begin{table}[h]
+\caption{IDAE components and their mutability}
+\label{tab:components}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lll}
+\toprule
+\textbf{Component} & \textbf{Responsibility} & \textbf{Mutable?} \\
+\midrule
+IntentionStore & Semantic intentions and chaining & Never \\
+ValidatorStore & Validators; immutable final telos & Intermediate only \\
+ProgramStore & Active program per intention/format & Discarded \\
+Negotiator & Two-phase intervention hierarchy & Fixed \\
+Synthesizer & LLM synthesis; rebuilds validators & On failure \\
+CompressionEngine & Suspends/reactivates intentions & Fixed \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\textbf{Intervention hierarchy.} When the current program produces a rejected output: (1) the program is discarded; (2) \textit{Phase~1}: the Negotiator synthesizes new programs (TTL = 3); (3) \textit{Phase~2}: if Phase~1 is exhausted and the intention is not the telos, the LLM rebuilds the intermediate validator, using the telos as an anchor, and a new program is synthesized (TTL = 2); (4) otherwise, a \texttt{SystemicInconsistencyError} is raised. The telos is never changed. The LLM receives only the intention and the failing sample, never the previous program.
+
+\textbf{Amortization.} The approved program is reused for subsequent records of the same format without calling the LLM. The LLM leaves the critical path: cost depends on the number $k$ of distinct formats, not on the number $N$ of records. If a format exhausts the TTL, it is marked as exhausted and its subsequent records are rejected without new synthesis.
+
+\textbf{Compression.} After intention 1, the CompressionEngine tests the input against the validators of the intermediate intentions; if it already satisfies $V_k$, intentions up to $k$ are suspended for that stream and reactivated when the data changes. The \texttt{chain\_path} field records the path taken.
+
+\section{Evaluation Methodology}
+\label{sec:method}
+
+\subsection{Oracle and domains}
+
+Every synthetic record is generated together with its ground truth by a seeded PRNG. Each domain has six phases: five format variations and one adversarial phase with ten variants (seven that \textit{must} be rejected and three that are acceptable but tricky).
+
+\textbf{Financial} (telos: \texttt{audit\_\allowbreak id}, \texttt{value\_\allowbreak in\_\allowbreak usd}, \texttt{date} DD/MM/YYYY in UTC, \texttt{category}, \texttt{status}): clean JSON; renamed JSON with a $-$03:00 offset (20\% of the records fall on the next day in UTC); pre-aggregated with the value already in USD; pipe-delimited with spelled-out currency, Brazilian number format and Portuguese month names; headerless CSV with reordered columns. Adversarial variants include missing currency, zero, negative or non-numeric value, missing date, unknown currency and a record from another domain.
+
+\textbf{IoT} (telos: \texttt{device\_id}, \texttt{metric}, \texttt{value} in the canonical unit, \texttt{timestamp\_utc}, \texttt{status} derived from thresholds, \texttt{zone}): clean JSON; a vendor format with coded fields and zones; Fahrenheit; legacy pipe format (F, \%, mbar); CSV in Kelvin. Adversarial variants include missing metric, timestamp or zone, the value \texttt{"NaN"}, physically impossible values and a financial record.
+
+\textbf{USGS}: 560 real events from the USGS Earthquake Catalog (GeoJSON M4+, mixed-network CSV, micro-event GeoJSON, raw CSV and an interleaved mixed stream). The oracle is derived deterministically from the source fields. We evaluate two teloi: a \textit{strict} one, which requires an integer \texttt{significance} and depth $\geq 0$, and a \textit{corrected} one, with a null \texttt{significance} when it is absent from the source (the USGS CSV has no \texttt{sig} field) and depth $\geq -10$ km (the USGS records negative depths, above the datum).
+
+\subsection{Approaches}
+
+All approaches receive \textbf{the same specification text}, including the rejection rule (``if the record cannot be converted faithfully, reject it; never guess''):
+
+\begin{itemize}
+\item \textbf{Schema-Based}: a hand-written deterministic parser for the Phase~1 format.
+\item \textbf{LLM-Direct}: one call per record; the LLM returns the final JSON or \texttt{null}; no validator.
+\item \textbf{LLM+Val+Retry}: like LLM-Direct, but with the telos validator as a gate and up to 3 attempts; no amortization.
+\item \textbf{IDAE}: synthesis with TTL = 3, the validator as a gate, amortization and exhausted-format marking, with programs indexed by format signature.
+\item \textbf{IDAE-chain}: a chain of 4 intentions with compression and Phase~2.
+\item \textbf{Variants} (E4, E5): no validator; no amortization; \textit{grounded validator} (the identifier must appear literally in the input and, for IoT, \texttt{status} must be consistent with the value); \textit{amortized explicit rejection} (a \texttt{null} from the program rejects the record without discarding the program, and a rejecting program is kept for the format); \textit{N-version} with $k=2$ (two independent programs must agree); and \textit{IDAE+}, which combines the last three.
+\end{itemize}
+
+\subsection{Models and protocol}
+
+The main model is \textbf{Claude Opus 4.5} (identifier \texttt{claude-opus-4.5}). \textbf{Claude Haiku 4.5} is used as a smaller model in a sensitivity analysis. Synthesized programs run in a sandbox (\texttt{node:vm}, 1\,s timeout) with a fixed time zone (\texttt{America/\allowbreak Sao\_Paulo}), so that using local dates instead of UTC produces an observable error. Every prompt and response is logged in JSONL. Tokens are estimated as characters/4.
+
+In E2, the per-record approaches run on a stable subsample (20 records per regular phase plus the whole adversarial phase, $n = 150$ per domain); IDAE and Schema-Based run on the full stream (100 per phase and 50 adversarial, $n = 550$) and are also reported on the subsample, paired record by record. Paired comparisons use the exact McNemar test; comparisons across runs use the exact Wilcoxon signed-rank test and Cliff's $\delta$ \cite{arcuri2011practical}; proportions have 95\% Wilson intervals.
+
+\section{Results}
+
+\subsection{E1 --- Intention chain, compression and Phase~2 (RQ1)}
+
+The 4-intention chain processed 1,000 records in 5 phases (200 per phase) with 56 LLM calls. Compression worked as designed: the paths \texttt{[1,2,3,4]} (595 records), \texttt{[1,3,4]} (200, pre-enriched data) and \texttt{[1,4]} (200, pre-aggregated) were discovered without intervention. Only 5 records (0.5\%) were rejected. \textbf{However, 297 of the 995 accepted records (29.8\%) were wrong} (Table~\ref{tab:e1}).
+
+\begin{table}[h]
+\caption{E1 --- 4-intention chain (Opus 4.5, $n=200$ per phase)}
+\label{tab:e1}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{llccl}
+\toprule
+\textbf{Phase} & \textbf{Path} & \textbf{Correct} & \textbf{Corrupt} & \textbf{Wrong fields} \\
+\midrule
+P1 clean JSON & [1,2,3,4] & 200 & 0 & --- \\
+P2 pre-enriched & [1,3,4] & 200 & 0 & --- \\
+P3 pipe, spelled-out currency$^\dagger$ & [1,2,3,4] & 50 & 150 & value (150), category (50) \\
+P4 pre-aggregated & [1,4] & 200 & 0 & --- \\
+P5 informal CSV$^\dagger$ & [1,2,3,4] & 48 & 147 & value (147), category (49) \\
+\bottomrule
+\end{tabular}}
+\end{table}
+\noindent $^\dagger$Phases in which Phase~2 rebuilt the validator of intention 1.
+
+The corruptions are concentrated \textbf{exactly in the phases where Phase~2 fired}. The original validator of intention 1 requires an ISO currency code; faced with ``Reais'' or ``libra'', Phase~1 was exhausted and Phase~2 rebuilt a more permissive validator that accepted spelled-out names. The program for intention 2, synthesized in Phase~1 for ISO codes and still valid under its own validator, did not recognize the names and applied a rate of 1: only the dollar records (25\%) came out right, and records in reais were classified as international. The immutable telos detected nothing, because it only checks the format. \textbf{Relaxing an intermediate validator propagates silently down the chain}: Phase~2, presented as a recovery mechanism, is a corruption mechanism when downstream programs are not revalidated against the new semantics. In the phases without Phase~2, correctness was 100\%.
+
+\subsection{E2 --- Comparison with baselines under the oracle (RQ2--RQ4)}
+
+\begin{table}[h]
+\caption{E2 --- Opus 4.5. IDAE and Schema-Based on the full stream ($n=550$); LLM-Direct and LLM+Val+Retry on the subsample ($n=150$). Maximum attainable ``Correct'': 90.9\% (stream) and 76.7\% (subsample).}
+\label{tab:e2}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{llccccc}
+\toprule
+\textbf{Dom.} & \textbf{Approach} & \textbf{Correct} & \textbf{Corrupt} & \textbf{False rej.} & \textbf{Calls} & \textbf{Tokens/rec.} \\
+\midrule
+\multirow{4}{*}{Fin.} & Schema-Based & 19.1\% & 0.0\% & 410 & 0 & 0 \\
+ & IDAE & 90.9\% & 0.0\% & 15 & 17 & 27 \\
+ & LLM-Direct & 72.7\% & 4.0\% & 0 & 150 & 387 \\
+ & LLM+Val+Retry & 74.0\% & 2.7\% & 0 & 150 & 387 \\
+\midrule
+\multirow{4}{*}{IoT} & Schema-Based & 19.1\% & 0.0\% & 410 & 0 & 0 \\
+ & IDAE & 90.9\% & 0.0\% & 15 & 20 & 43 \\
+ & LLM-Direct & 76.0\% & 0.7\% & 0 & 150 & 497 \\
+ & LLM+Val+Retry & 76.0\% & 0.7\% & 0 & 150 & 497 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\textbf{With Opus 4.5, IDAE made no value errors} on 1,100 records and used 11--14$\times$ fewer tokens per record than per-record transformation --- a gap that grows with $N$, since IDAE's cost depends on $k$ rather than $N$. LLM-Direct's corruptions are of a kind that a format validator cannot detect: wrong Fahrenheit$\to$Celsius arithmetic ($-4.54$ instead of $-3.99$) and a whole pipe-delimited line copied as the identifier. LLM+Val+Retry makes the same errors, which confirms that the format validator does not filter them; the synthesized program, which does the arithmetic in code, does not make them.
+
+\textbf{Invalid inputs were rejected by every approach.} With the same specification and the explicit rejection rule, the three LLM-based approaches correctly rejected all 35 invalid inputs in each domain --- including LLM-Direct, which has no validator. With the rejection rule in the specification, rejecting invalid inputs did not depend on the validator.
+
+\textbf{IDAE falsely rejected the 15 acceptable adversarial inputs} (lowercase currency with a string value, Brazilian number format, day rollover in UTC; pressure in kPa, decimal comma, critical threshold). They share the format signature of invalid records that preceded them. Because IDAE cannot distinguish ``the program failed'' from ``the record is invalid'', an invalid record causes the current program to be discarded, Phase~1 exhausts the TTL trying to satisfy the validator with a record that should not be satisfied, and the format is marked as exhausted: subsequent valid records of that format are rejected without new synthesis. We call this effect \textbf{format poisoning}. On the paired subsample, LLM-Direct made more correct decisions than IDAE (exact McNemar: 15 vs 6, $p = 0.078$ for financial; 15 vs 1, $p < 0.001$ for IoT), entirely because of this effect.
+
+\textbf{Sensitivity to the model (Haiku 4.5).} With the smaller model (Table~\ref{tab:e2h}), IDAE had \textbf{21.5\% silent corruption} in the financial domain. Two programs explain all of it: in Phase~5, the synthesized program read the value at the wrong scale (3,816.58 BRL $\to$ 76,331.60 USD), and the validator, which only requires a positive value, approved it; amortization applied the error to 98 of the phase's 100 records. In Phase~2, the program used the local date instead of UTC and got the 20 late-night records wrong. IoT had no corruption, but two whole phases were rejected (115 false rejections). Per-record transformation with Haiku errs in a scattered way ($\sim$15--21\%); IDAE errs in a \textbf{concentrated and systematic} way: 0\% or 98\% per phase, depending on the quality of a single program.
+
+\begin{table}[h]
+\caption{E2 --- Haiku 4.5 (same streams and subsamples)}
+\label{tab:e2h}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{llcccc}
+\toprule
+\textbf{Dom.} & \textbf{Approach} & \textbf{Correct} & \textbf{Corrupt} & \textbf{False rej.} & \textbf{Calls} \\
+\midrule
+\multirow{3}{*}{Fin.} & IDAE & 51.3\% & 21.5\% & 115 & 19 \\
+ & LLM-Direct & 59.3\% & 20.7\% & 0 & 150 \\
+ & LLM+Val+Retry & 59.3\% & 17.3\% & 0 & 160 \\
+\midrule
+\multirow{3}{*}{IoT} & IDAE & 72.7\% & 0.0\% & 115 & 22 \\
+ & LLM-Direct & 62.0\% & 21.3\% & 0 & 150 \\
+ & LLM+Val+Retry & 62.0\% & 14.7\% & 0 & 170 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+The telos validator reduced per-record corruption (LLM-Direct $\to$ LLM+Val+Retry: from 20.7\% to 17.3\% and from 21.3\% to 14.7\%) by removing records that should have been rejected. Errors in value, date and in a status consistent with the value, however, got through.
+
+\subsection{E3 --- Real USGS data (RQ2, RQ3)}
+
+\begin{table}[h]
+\caption{E3 --- 560 real USGS events (Opus 4.5)}
+\label{tab:e3}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{llcccc}
+\toprule
+\textbf{Telos} & \textbf{Approach} & \textbf{Correct} & \textbf{Corrupt} & \textbf{Calls} & \textbf{Tokens} \\
+\midrule
+\multirow{3}{*}{Corrected} & IDAE & 100\% & 0\% & 2 & $\sim$2.7k \\
+ & IDAE+ & 100\% & 0\% & 4 & $\sim$5.6k \\
+ & LLM-Direct & 62.7\% & 37.3\% & 560 & $\sim$325k \\
+\midrule
+\multirow{2}{*}{Strict} & IDAE & 40.4\% & 59.6\% & 5 & $\sim$6.8k \\
+ & LLM-Direct & 2.0\% & 98.0\% & 560 & $\sim$295k \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+With the corrected telos, IDAE converted \textbf{all 560 real events correctly with 2 calls} (one program for GeoJSON and one for CSV, including quoted commas in the \texttt{place} field), against 62.7\% for LLM-Direct with 560 calls --- a $\sim$120$\times$ reduction in tokens. LLM-Direct's 208 errors are timestamp errors: the model converted epoch milliseconds to ISO~8601 ``in its head'' and got hours and days wrong. This is the same pattern as in E2: arithmetic done by the LLM fails, arithmetic done by the synthesized program does not.
+
+\textbf{The strict telos induces fabrication.} It requires an integer \texttt{significance}, a field that does not exist in the USGS CSV. IDAE accepted 330 CSV records with an invented value (327 with \texttt{significance = 0}) and accepted the 11 events with negative depth (7 of which are among the 330 CSV records, for a total of 334 corruptions) after the synthesized program \textbf{replaced the depth with 0} to satisfy the $\geq 0$ constraint. This is a case of \textit{validator hacking} by the program itself: when the specification cannot be satisfied by real data, the synthesizer finds a program that satisfies it by altering the data.
+
+\subsection{E4 --- Ablation and variants (RQ5)}
+
+Each variant removes or adds a single mechanism on the same stream as E2 (Opus 4.5, same seed). Phase~2 does not apply here (a single, immutable intention); its effect was measured in E1.
+
+\begin{table}[h]
+\caption{E4 --- Ablation ($n=550$ per domain; ``no amortization'' on the 150-record subsample, whose maximum ``Correct'' is 76.7\%)}
+\label{tab:e4}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lcccccc}
+\toprule
+ & \multicolumn{3}{c}{\textbf{Financial}} & \multicolumn{3}{c}{\textbf{IoT}} \\
+\textbf{Variant} & \textbf{Corr./Corrupt} & \textbf{F.rej.} & \textbf{Calls} & \textbf{Corr./Corrupt} & \textbf{F.rej.} & \textbf{Calls} \\
+\midrule
+IDAE (baseline) & 90.9 / 0.9 & 15 & 16 & 90.9 / 0.0 & 15 & 20 \\
+no validator & 90.9 / 0.9 & 15 & 17 & 90.9 / 0.0 & 15 & 20 \\
+grounded validator & 90.9 / 0.0 & 15 & 17 & 90.9 / 0.0 & 15 & 20 \\
+explicit rejection & 92.7 / 0.9 & 0 & 8 & 93.6 / 0.0 & 0 & 9 \\
+N-version ($k=2$) & 90.9 / 0.0 & 15 & 22 & 90.9 / 0.0 & 15 & 25 \\
+IDAE+ (all) & 92.7 / 0.0 & 5 & 25 & 93.6 / 0.0 & 0 & 30 \\
+no amortization & 76.7 / 0.0 & 0 & 220 & 76.7 / 0.0 & 0 & 220 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\textbf{The format validator made no measurable difference.} ``IDAE (baseline)'' and ``no validator'' made identical decisions in both domains. For the 5 financial records without currency, both adopted a program that assigned a default currency, and the validator approved it. With Opus 4.5, synthesized programs rarely produce malformed outputs; when they are wrong, they are wrong with a valid format. The ``grounded'' and ``N-version'' variants rejected these 5 records, but the reason logs show that this happened by TTL exhaustion (the sampled programs rejected) and not through the mechanism itself: we do not credit them with this effect.
+
+\textbf{Without amortization}, correctness is maximal (76.7\% of the attainable 76.7\% on the subsample) with no false rejections, but it takes 220 calls for 150 records, against 16--20 for 550 --- amortization is the source of the cost savings and also of format poisoning.
+
+\textbf{Amortized explicit rejection} removed all 15 false rejections in both domains and halved the number of calls (8--9 instead of 16--20), because an invalid record no longer costs 3 syntheses. It also exposed a new error: in the financial domain, records with a string value (\texttt{"3440.04"}), previously rejected by poisoning, were now processed by the amortized Phase~1 program, which read the dot as a Brazilian thousands separator (344,004 USD) --- 5 corruptions approved by the validator.
+
+\textbf{N-version caught this error.} In IDAE+, the second, independent program disagreed with the first on these 5 records, which were rejected (\texttt{nversion-disagree}) instead of corrupted: the error became a safe failure. The cost was 25--30 calls, still an order of magnitude below per-record transformation.
+
+\subsection{E5 --- Independent repetitions (RQ5)}
+
+E5 repeats, with 6 seeds per domain (50 records per phase and 30 adversarial; different data and LLM sampling in every run), the baseline IDAE, IDAE+ and IDAE without a validator on the full stream, and LLM-Direct on the adversarial phase.
+
+\begin{table}[h]
+\caption{E5 --- 6 runs per domain (mean $\pm$ standard deviation, \% of $n=280$)}
+\label{tab:e5}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{llcccc}
+\toprule
+\textbf{Dom.} & \textbf{Approach} & \textbf{Correct} & \textbf{Corrupt} & \textbf{False rej.} & \textbf{Calls} \\
+\midrule
+\multirow{3}{*}{Fin.} & IDAE (baseline) & 89.3$\pm$0.0 & 0.2$\pm$0.4 & 3.2$\pm$0.0 & 16.8$\pm$1.0 \\
+ & IDAE no validator & 89.3$\pm$0.0 & 0.2$\pm$0.4 & 3.2$\pm$0.0 & 16.7$\pm$0.8 \\
+ & IDAE+ & 92.5$\pm$0.0 & 0.0$\pm$0.0 & 0.0$\pm$0.0 & 20.5$\pm$1.0 \\
+\midrule
+\multirow{3}{*}{IoT} & IDAE (baseline) & 89.3$\pm$0.0 & 0.0$\pm$0.0 & 3.2$\pm$0.0 & 20.0$\pm$0.0 \\
+ & IDAE no validator & 89.3$\pm$0.0 & 0.0$\pm$0.0 & 3.2$\pm$0.0 & 20.0$\pm$0.0 \\
+ & IDAE+ & 92.5$\pm$0.0 & 0.0$\pm$0.0 & 0.0$\pm$0.0 & 22.0$\pm$0.0 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+IDAE+ outperformed the baseline IDAE in correctness and false rejections in \textbf{all 6 runs of both domains} (exact Wilcoxon, $p = 0.031$, the smallest possible value with $n = 6$; Cliff's $\delta = 1.0$), at the cost of 2--4 more calls per run ($p = 0.031$). The baseline IDAE had corruption in 1 of the 6 financial runs (3 records without currency accepted with an invented currency). LLM-Direct, on the adversarial phase, had corruption in 1 of the 6 IoT runs (1 record) and in none of the financial runs. Differences in corruption between approaches are not significant ($p = 1.0$): with Opus 4.5 and the rejection rule in the specification, corruption is a rare event for all approaches in these domains. \textbf{Removing the format validator did not change a single decision in any of the 12 runs.}
+
+\subsection{E6 --- $H_r$ and TTL sensitivity (RQ6)}
+
+For every synthesis attempt in E4 and E5 (except the no-amortization variant, which ran in parallel), we recorded whether the program was approved by the validator and its $H_r$ measured against the oracle on the record that triggered the synthesis.
+
+\textbf{With Opus 4.5, all 327 syntheses triggered by acceptable records converged on the first attempt, with $H_r = 0$ against the oracle.} No program approved by the validator had a wrong field on its triggering record, and attempts 2 and 3 were never used by valid records. The TTL of 3 was consumed entirely by records that \textit{should} have been rejected: 315 synthesis sequences, costing 598 calls (65\% of all synthesis calls), in which the validator ended up approving a program that fabricated the output in 7 cases (2.2\%). \textbf{With a capable model, a TTL $> 1$ helped no valid record and only increased exposure to fabrication} --- each extra attempt is one more LLM sample trying to satisfy a record that should not be satisfied. The program errors observed in E2 with Haiku (value scale, local date) also had $H_r > 0$ despite validator approval: $H_r$ measured by the validator measures format convergence, not semantic convergence.
+
+\subsection{E7 --- Gradual drift and an ill-specified telos (RQ3, RQ4)}
+
+\textbf{Drift.} In records with the Phase~1 format, a growing fraction (5, 20, 50 and 80\%) arrives without currency, and the correct decision is to reject them. Each level was run 3 times for IDAE (12 runs per variant). \textbf{The baseline IDAE fabricated the currency in 2 of the 12 runs}: a program with \texttt{data.currency || 'USD'} passed the validator and was amortized over all records without currency in that stream (25 and 4 corrupted records; 100\% of the invalid records in the run). In the other 10 runs it rejected correctly, spending 3 calls to exhaust the format. The \textbf{amortized explicit rejection} variant rejected correctly in 12 of 12 runs, with 2 calls instead of 4, because the rejecting program is kept and the LLM is not resampled for every invalid record. LLM-Direct was always right, with 100 calls per level.
+
+\textbf{Ill-specified telos.} With a specification that does not require a positive value and a validator that does not check the sign, IDAE accepted, with a single call, all negative and zero records (20 of 30; 66.7\% corruption), with both Opus and Haiku. ``Validator-relative hallucination'' was zero. With the correct specification, invalid records were rejected, but the first negative record poisoned the format and \textbf{9 of the 10 subsequent valid records were rejected}. In exploratory runs, Opus 4.5 rejected negative values even without the rule in the specification, and stopped rejecting missing currency when the rejection rule was removed: \textbf{the rejection rule in the specification is what prevents fabrication}, not the validator.
+
+\section{Discussion}
+
+\textbf{What amortization buys.} With a capable model, synthesizing one program per format and running it deterministically is cheaper ($\sim$11--120$\times$ fewer tokens), more auditable (one inspectable program per format instead of $N$ responses) and, in this study, \textit{more correct} than asking the LLM to transform each record: programs do not get time-zone, epoch or unit arithmetic wrong the way an LLM does when it generates text. This is IDAE's most robust positive result.
+
+\textbf{What amortization costs.} The same property that makes IDAE cheap makes its errors systematic: a faulty program approved by the validator is applied to the whole format (98 of 100 records in E2 with Haiku; 100\% of the records without currency in E7). Per-record transformation errs in a scattered way; IDAE errs per format. For a downstream consumer, systematic errors are more harmful (bias) and also easier to detect (a single program to inspect).
+
+\textbf{The guarantee belongs to the specification, not to the architecture.} The immutable telos guarantees exactly what the validator checks. Every corruption mechanism we observed --- amortization of a faulty program, relaxation in Phase~2, an unsatisfiable telos that induces fabrication, and \textit{clamping} --- produced outputs that satisfy the validator. Claims such as ``0\% hallucination'' are only defensible as ``0\% validator violations'', which is trivial.
+
+\textbf{Phase~2 requires downstream revalidation.} Rebuilding an intermediate validator changes the contract between intentions. A safe design should, at a minimum, invalidate downstream programs when an upstream validator is relaxed, or restrict Phase~2 to relaxations whose semantics the telos can check.
+
+\textbf{Rejection is a result, not a failure.} Format poisoning comes from treating ``the program returned \texttt{null}'' as a failure of the program. Allowing the program to reject the record, and amortizing that rejection, removes false rejections and reduces calls (E4, E5, E7).
+
+\textbf{Practical implications.} (1) Write teloi that real data can satisfy --- optional fields must be nullable. (2) Include the rejection rule in the specification. (3) Validate synthesized programs against invariants that can be checked without an oracle (grounding in the input, cross-field consistency) and, when cost allows, against a second independent version \cite{avizienis1985nversion}, bearing in mind that versions generated by the same model are not independent \cite{knight1986experimental}. (4) Sample and audit amortized programs: auditing $k$ programs is cheap compared with auditing $N$ records.
+
+\textbf{Beyond data extraction.} Nothing in the evaluated mechanism is specific to data. IDAE is an instance of a more general pattern, which we call \textit{disposable programs under an immutable specification}: an LLM synthesizes one program per input class, a fixed executable specification decides whether it is accepted, and the program is reused until the class changes. Our results suggest three conditions for the pattern to pay off. (i) \textit{A strong, checkable specification}: a format validator changed no decision (E4, E5), whereas grounding in the input and N-version caught errors; the benefit grows as the validator approaches an oracle. (ii) \textit{Few classes and many cases per class} ($k \ll N$): this is where the cost reduction comes from; if every input is unique, the pattern degenerates into calling the LLM per case. (iii) \textit{Auditable errors}: since a faulty program errs systematically across its whole class, the domain must allow inspecting or sampling the $k$ programs. Candidate domains that meet these conditions include code migration with differential testing, where the legacy system serves as the oracle; adapters between services under contract tests; and infrastructure configuration under policy as code. Where the specification is ambiguous or cannot be checked, the pattern provides false confidence, as the strict USGS telos illustrates (E3). This evaluation covers only data extraction; the generality of the pattern is a hypothesis, not a result of this work.
+
+\section{Related Work}
+
+\textbf{Intent-first development and program synthesis.} Industry discussions of ``intent-first'' development \cite{shoukry2026future} (cited as evidence of a trend, not as a foundation) revisit declarative programming \cite{lloyd1994practical} and synthesis from specifications \cite{gulwani2017program}. LLMs have made synthesis practical \cite{chen2021evaluating}; IDAE uses synthesis as a run-time adaptation mechanism, with the program as a disposable artifact.
+
+\textbf{Self-adaptive systems.} The MAPE-K loop \cite{kephart2003vision} and the challenges of preserving stability during adaptation \cite{salehie2009self,cheng2009software} inspire the intervention hierarchy. IDAE reacts to violations of the specification rather than to operational metrics; our results show that adapting the specification itself (Phase~2) is risky.
+
+\textbf{Contracts and oracles.} In Design by Contract \cite{meyer1997object}, the contract is passive; in IDAE, it drives synthesis. Both inherit the oracle problem \cite{barr2015oracle}: a contract checks properties, not true values. Our methodology makes the gap between the two explicit.
+
+\textbf{ETL and data wrangling.} Airflow \cite{airflow2023} and dbt \cite{dbt2024} operate on hand-written transformations; wrangling tools \cite{kandel2011wrangler} infer transformations from statistical profiles; ontology-based approaches align known schemas \cite{santosjunior2023federated}. IDAE synthesizes transformations on demand for unanticipated formats.
+
+\textbf{LLMs in software engineering and hallucination.} LLMs generate code, repair programs and synthesize tests \cite{chen2021evaluating,prenner2022automatic,schafer2023empirical}; multi-agent systems orchestrate roles \cite{qian2024communicative,hong2024metagpt}. Hallucination --- fluent output that is unfaithful to the source --- is well documented \cite{ji2023survey}. We show that, in extraction, taking the LLM off the critical path removes one kind of error (per-record arithmetic) and creates another (amortized systematic error). The diversity between versions generated by the same model is limited, as previously observed for human N-version programming \cite{knight1986experimental}.
+
+\section{Threats to Validity}
+
+\textbf{Construct validity.} Corruption is measured against an oracle that we wrote. The conversion rules (rates, UTC time zone, thresholds) are stated in the specification given to all approaches, and unit tests check that every ground truth satisfies the validator. The USGS oracles are derived from the source fields, but the corrected telos is our choice. The numeric tolerance (0.011 in USD; 0.051 for sensor values) may accept rounding differences.
+
+\textbf{Internal validity.} LLMs are non-deterministic and we did not control the temperature (we used the model's default configuration). We mitigate this with repetitions (E5, E7) and by logging every call. A first run of E4, E5 and E7 was interrupted when we found that explicit rejection, in its initial version, did not amortize the rejecting program (which resampled the LLM and increased exposure to programs that fabricate data); its logs are preserved in the artifact package, and the reported results come from the corrected version. Token estimates based on characters are approximate.
+
+\textbf{External validity.} Two synthetic domains and one real domain, with few formats ($k \le 5$ per domain). Results with Opus 4.5 and Haiku 4.5 do not automatically generalize to other models; the sensitivity observed between the two suggests that IDAE's correctness depends heavily on the model. We did not evaluate local open-weight models.
+
+\textbf{Conclusion validity.} The LLM baselines ran on 150-record subsamples per domain, and IDAE on full streams; paired comparisons use only the intersection. There are 6 repetitions per domain, the minimum for an exact two-sided Wilcoxon test to reach $p < 0.05$.
+
+\section{Conclusion}
+
+IDAE makes the intent the permanent artifact and the program the disposable one. Evaluated against a ground-truth oracle, the framework delivers on its promise of \textbf{cost and determinism}: with a capable model, it converted 560 real seismic events without errors using 2 calls, against 62.7\% with 560 calls for per-record transformation, and it did not make the arithmetic errors that the per-record LLM makes.
+
+The \textbf{semantic} promise does not hold as an architectural property. The telos validator guarantees only what it checks; amortization turns a faulty program into a systematic error; rebuilding intermediate validators silently corrupted three quarters of the records in the phases where it fired; and an unsatisfiable telos led the synthesizer to fabricate and alter real data to satisfy it. Moreover, treating the rejection of a record as a failure of the program poisons entire formats. Amortized explicit rejection and grounded validation with N-version programming reduce these effects at low cost.
+
+Future work: instantiating the pattern in a second domain with a strong specification (code migration with differential testing) to test the hypothesis that silent corruption decreases as the telos becomes stronger; downstream revalidation after Phase~2; generating checkable invariants from the telos; sample-based auditing of amortized programs; and evaluation with more formats ($k > 10$), open-weight models and domains with ambiguous semantics.
+
+\section*{Artifact Availability}
+
+The artifact package contains the implementation of IDAE, of the intention chain and of all approaches; seeded generators and oracles; the 560 USGS events; the scripts for experiments E1--E7; unit tests; raw per-record results; and the JSONL log of every prompt and model response. It is available at \url{https://github.com/carloseduardodb/idae}. A Portuguese version of this article is archived on Zenodo under DOI \href{https://doi.org/10.5281/zenodo.23050791}{10.5281/zenodo.23050791}.
+
+\section*{Declaration of Generative AI Use}
+
+Besides the use of LLMs as the object of study (Claude Opus 4.5 and Haiku 4.5 as synthesizers and baselines), a generative AI assistant (Claude) was used to implement the evaluation scripts and to draft and translate versions of this text. The author reviewed the code, the results and the text, and takes full responsibility for the content.
+
+\bibliographystyle{ACM-Reference-Format}
+\begin{thebibliography}{30}
+
+\bibitem{airflow2023}
+Apache Airflow. 2023.
+Apache Airflow Documentation.
+\url{https://airflow.apache.org/docs/}
+
+\bibitem{arcuri2011practical}
+Andrea Arcuri and Lionel Briand. 2011.
+A practical guide for using statistical tests to assess randomized algorithms in software engineering.
+In \textit{Proceedings of the 33rd International Conference on Software Engineering (ICSE)}. 1--10.
+
+\bibitem{astrom1995adaptive}
+Karl J. \AA{}str\"om and Bj\"orn Wittenmark. 1995.
+\textit{Adaptive Control}.
+Addison-Wesley.
+
+\bibitem{avizienis1985nversion}
+Algirdas Avi\v{z}ienis. 1985.
+The N-version approach to fault-tolerant software.
+\textit{IEEE Transactions on Software Engineering} SE-11, 12 (1985), 1491--1501.
+
+\bibitem{barr2015oracle}
+Earl T. Barr, Mark Harman, Phil McMinn, Muzammil Shahbaz, and Shin Yoo. 2015.
+The oracle problem in software testing: A survey.
+\textit{IEEE Transactions on Software Engineering} 41, 5 (2015), 507--525.
+
+\bibitem{chen2021evaluating}
+Mark Chen, Jerry Tworek, Heewoo Jun, Qiming Yuan, Henrique Ponde de Oliveira Pinto, Jared Kaplan, Harri Edwards, Yuri Burda, Nicholas Joseph, Greg Brockman, et al. 2021.
+Evaluating large language models trained on code.
+\textit{arXiv preprint arXiv:2107.03374} (2021).
+
+\bibitem{cheng2009software}
+Betty H. C. Cheng, Rog\'erio de Lemos, Holger Giese, Paola Inverardi, Jeff Magee, et al. 2009.
+Software engineering for self-adaptive systems: A research roadmap.
+In \textit{Software Engineering for Self-Adaptive Systems}. Springer, 1--26.
+
+\bibitem{dbt2024}
+dbt Labs. 2024.
+dbt: Transform data in your warehouse.
+\url{https://docs.getdbt.com/}
+
+\bibitem{gulwani2017program}
+Sumit Gulwani, Oleksandr Polozov, and Rishabh Singh. 2017.
+Program synthesis.
+\textit{Foundations and Trends in Programming Languages} 4, 1--2 (2017), 1--119.
+
+\bibitem{hong2024metagpt}
+Sirui Hong, Mingchen Zhuge, Jonathan Chen, Xiawu Zheng, Yuheng Cheng, et al. 2024.
+MetaGPT: Meta programming for a multi-agent collaborative framework.
+In \textit{Proceedings of the 12th International Conference on Learning Representations (ICLR)}.
+
+\bibitem{ji2023survey}
+Ziwei Ji, Nayeon Lee, Rita Frieske, Tiezheng Yu, Dan Su, Yan Xu, Etsuko Ishii, Ye Jin Bang, Andrea Madotto, and Pascale Fung. 2023.
+Survey of hallucination in natural language generation.
+\textit{Comput. Surveys} 55, 12 (2023), 1--38.
+
+\bibitem{kandel2011wrangler}
+Sean Kandel, Andreas Paepcke, Joseph Hellerstein, and Jeffrey Heer. 2011.
+Wrangler: Interactive visual specification of data transformation scripts.
+In \textit{Proceedings of the SIGCHI Conference on Human Factors in Computing Systems}. 3363--3372.
+
+\bibitem{kephart2003vision}
+Jeffrey O. Kephart and David M. Chess. 2003.
+The vision of autonomic computing.
+\textit{Computer} 36, 1 (2003), 41--50.
+
+\bibitem{knight1986experimental}
+John C. Knight and Nancy G. Leveson. 1986.
+An experimental evaluation of the assumption of independence in multiversion programming.
+\textit{IEEE Transactions on Software Engineering} SE-12, 1 (1986), 96--109.
+
+\bibitem{liskov2000program}
+Barbara Liskov and John Guttag. 2000.
+\textit{Program Development in Java}.
+Addison-Wesley.
+
+\bibitem{lloyd1994practical}
+John W. Lloyd. 1994.
+Practical advantages of declarative programming.
+In \textit{Joint Conference on Declarative Programming (GULP-PRODE'94)}. 18--30.
+
+\bibitem{meyer1997object}
+Bertrand Meyer. 1997.
+\textit{Object-Oriented Software Construction} (2 ed.).
+Prentice Hall.
+
+\bibitem{prenner2022automatic}
+Julian Aron Prenner, Hlib Babii, and Romain Robbes. 2022.
+Can OpenAI's Codex fix bugs? An evaluation on QuixBugs.
+In \textit{Proceedings of the Third International Workshop on Automated Program Repair (APR)}. 69--75.
+
+\bibitem{qian2024communicative}
+Chen Qian, Wei Liu, Hongzhang Liu, Nuo Chen, Yufan Dang, et al. 2024.
+ChatDev: Communicative agents for software development.
+In \textit{Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (ACL)}.
+
+\bibitem{salehie2009self}
+Mazeiar Salehie and Ladan Tahvildari. 2009.
+Self-adaptive software: Landscape and research challenges.
+\textit{ACM Transactions on Autonomous and Adaptive Systems} 4, 2 (2009), Article 14.
+
+\bibitem{santosjunior2023federated}
+Paulo S\'ergio dos Santos J\'unior, Jo\~ao Paulo A. Almeida, and Monalessa Barcellos. 2023.
+Towards federated ontology-driven data integration in continuous software engineering.
+In \textit{Proceedings of the XXXVII Brazilian Symposium on Software Engineering (SBES)}. ACM, 432--441.
+
+\bibitem{schafer2023empirical}
+Max Sch\"afer, Sarah Nadi, Aryaz Eghbali, and Frank Tip. 2024.
+An empirical evaluation of using large language models for automated unit test generation.
+\textit{IEEE Transactions on Software Engineering} 50, 1 (2024), 85--105.
+
+\bibitem{shoukry2026future}
+Ayman Shoukry. 2026.
+The future of software development: Why coding becomes a specialist sport.
+\textit{BairesDev Blog} (March 2026).
+\url{https://www.bairesdev.com/blog/the-future-of-software-development/}
+
+\end{thebibliography}
+
+\end{document}

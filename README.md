@@ -7,6 +7,11 @@ Realmente Garante — um Estudo com Extração de Dados* —
 [doi.org/10.5281/zenodo.23050791](https://doi.org/10.5281/zenodo.23050791)
 (PDF e fonte LaTeX em `article/old/`).
 
+English version: *Disposable Programs under an Immutable Specification: What a
+Validator Actually Guarantees — A Study on Data Extraction* —
+[doi.org/10.5281/zenodo.23062292](https://doi.org/10.5281/zenodo.23062292)
+(PDF and LaTeX source in `article/arxiv/`).
+
 Autor: Carlos Eduardo Dias Batista — ORCID [0009-0005-5726-0289](https://orcid.org/0009-0005-5726-0289)
 
 Implementação e avaliação experimental do IDAE, com oráculo de verdade-terreno.
@@ -43,7 +48,7 @@ idae/
 ├── tests/unit.test.js        25 testes sem LLM (oráculo, validators, estatística, mecânica do IDAE)
 ├── data/usgs/                560 eventos reais do USGS Earthquake Catalog
 ├── results/                  JSON por experimento, RESUMO.md, logs/*.jsonl (prompts e respostas)
-└── article/                  artigo em LaTeX (+ classe ACM)
+└── article/                  old/ (português) e arxiv/ (inglês): LaTeX + classe ACM
 ```
 
 ## Experimentos
